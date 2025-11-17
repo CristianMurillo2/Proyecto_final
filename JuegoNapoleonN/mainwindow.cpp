@@ -1,6 +1,9 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include <QUrl>
+#include "pantallanivel1.h"
+#include "pantallanivel2.h"
+#include "pantallanivel3.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -20,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
         this->update();
     });
 
-    QString rutaVideo = "C:/Users/rgome/OneDrive/Documentos/Qt Informatica 2/Proyecto final/JuegoNapoleonN/PortadaNapoleon.mp4";
+    QString rutaVideo = "C:/Users/rgome/OneDrive/Documentos/Qt Informatica 2/Proyecto final/GitHub/JuegoNapoleonN/PortadaNapoleon.mp4";
     m_player->setSource(QUrl::fromLocalFile(rutaVideo));
     m_audioOutput->setVolume(0);
     m_player->setLoops(QMediaPlayer::Infinite);
@@ -30,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_musicaOutput = new QAudioOutput(this);
     m_musicaPlayer->setAudioOutput(m_musicaOutput);
 
-    QString rutaMusica = "C:/Users/rgome/OneDrive/Documentos/Qt Informatica 2/Proyecto final/JuegoNapoleonN/mi_musica.mp3";
+    QString rutaMusica = "C:/Users/rgome/OneDrive/Documentos/Qt Informatica 2/Proyecto final/GitHub/JuegoNapoleonN/mi_musica.mp3";
     m_musicaPlayer->setSource(QUrl::fromLocalFile(rutaMusica));
     m_musicaOutput->setVolume(0.5);
     m_musicaPlayer->setLoops(QMediaPlayer::Infinite);
@@ -52,3 +55,34 @@ void MainWindow::paintEvent(QPaintEvent *event)
         painter.fillRect(rect(), Qt::black);
     }
 }
+
+void MainWindow::on_btnNivel1_clicked()
+{
+
+    hide();
+    pantalla1 = new pantallaNivel1(this);
+    pantalla1->show();
+    connect(pantalla1, &QDialog::finished, this, &MainWindow::show);
+    pantalla1->show();
+}
+
+
+void MainWindow::on_btnNivel2_clicked()
+{
+    hide();
+    pantalla2 = new pantallaNivel2(this);
+    pantalla2->show();
+    connect(pantalla2, &QDialog::finished, this, &MainWindow::show);
+    pantalla2->show();
+}
+
+
+void MainWindow::on_btnNivel3_clicked()
+{
+    hide();
+    pantalla3 = new pantallaNivel3(this);
+    pantalla3->show();
+    connect(pantalla3, &QDialog::finished, this, &MainWindow::show);
+    pantalla3->show();
+}
+

@@ -7,6 +7,9 @@
 #include <QVideoSink>
 #include <QVideoFrame>
 #include <QPainter>
+#include "pantallanivel1.h"
+#include "pantallanivel2.h"
+#include "pantallanivel3.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -23,6 +26,13 @@ public:
 protected:
     void paintEvent(QPaintEvent *event) override;
 
+private slots:
+    void on_btnNivel1_clicked();
+
+    void on_btnNivel2_clicked();
+
+    void on_btnNivel3_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -33,6 +43,10 @@ private:
 
     QMediaPlayer *m_musicaPlayer;
     QAudioOutput *m_musicaOutput;
+
+    pantallaNivel1 *pantalla1;
+    pantallaNivel2 *pantalla2;
+    pantallaNivel3 *pantalla3;
 };
 
 #endif // MAINWINDOW_H
