@@ -22,6 +22,8 @@ qt_add_executable(appJuegoNapoleonN
     pantallanivel1.h pantallanivel1.cpp pantallanivel1.ui
     pantallanivel2.h pantallanivel2.cpp pantallanivel2.ui
     pantallanivel3.h pantallanivel3.cpp pantallanivel3.ui
+    movimientoparticula.h movimientoparticula.cpp
+    cannonball.h cannonball.cpp
 )
 
 target_link_libraries(appJuegoNapoleonN PRIVATE
