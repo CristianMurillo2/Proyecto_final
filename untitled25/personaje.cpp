@@ -1,109 +1,109 @@
 #include "personaje.h"
 #include <QPixmap>
 #include <QGraphicsScene>
+#include <QPainter>
 
-personaje::personaje(QGraphicsItem *parent)
+Personaje::Personaje(QGraphicsItem *parent)
     : QObject(nullptr),
     QGraphicsPixmapItem(parent),
-    velocidad(5.0),
+    velocidadMax(5.0),
+    ancho(50),
+    alto(50),
     vida(VIDA_INICIAL),
     vidasRestantes(VIDAS_INICIALES)
 {
-    // El cuerpo del constructor
-    QPixmap sprite(":/sprites/personaje.png");
-    setPixmap(sprite.scaled(QSize(50, 70), Qt::KeepAspectRatio));
+    QPixmap pixmapEsfera(ancho, alto);
+    pixmapEsfera.fill(Qt::transparent);
+    QPainter painter(&pixmapEsfera);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setBrush(Qt::red);
+    painter.setPen(QPen(Qt::black, 2));
+    painter.drawEllipse(1, 1, ancho-2, alto-2);
+    painter.end();
+    setPixmap(pixmapEsfera);
 }
 
-int personaje::getVida() const
+void Personaje::setVelocidadMax(qreal nuevaVelocidad)
+{
+    velocidadMax = nuevaVelocidad;
+}
+
+void Personaje::setImagen(QString rutaImagen)
+{
+    QPixmap sprite(rutaImagen);
+    if (!sprite.isNull()) {
+        setPixmap(sprite.scaled(QSize(ancho, alto), Qt::KeepAspectRatio));
+    }
+}
+
+void Personaje::setTamano(qreal w, qreal h)
+{
+    ancho = w;
+    alto = h;
+    if (!pixmap().isNull()) {
+        setPixmap(pixmap().scaled(QSize(ancho, alto), Qt::IgnoreAspectRatio));
+    }
+}
+
+int Personaje::getVida() const
 {
     return vida;
 }
 
-int personaje::getVidasRestantes() const
+int Personaje::getVidasRestantes() const
 {
     return vidasRestantes;
 }
 
-void personaje::setVida(int nuevaVida)
+void Personaje::setVida(int nuevaVida)
 {
     vida = nuevaVida;
-    if (vida > VIDA_INICIAL) {
-        vida = VIDA_INICIAL;
-    }
-
+    if (vida > VIDA_INICIAL) vida = VIDA_INICIAL;
     if (vida <= 0) {
         vida = 0;
         emit personajeMuerto();
     }
-
     emit vidaCambiada(vida);
 }
 
-void personaje::setVidasRestantes(int nuevasVidas)
+void Personaje::setVidasRestantes(int nuevasVidas)
 {
     vidasRestantes = nuevasVidas;
-
     if (vidasRestantes < 0) {
         vidasRestantes = 0;
-        emit gameOver(); // Emite la señal de juego terminado
+        emit gameOver();
     }
-
     emit vidasCambiadas(vidasRestantes);
 }
 
-void personaje::recibirDano(int cantidad)
+void Personaje::recibirDano(int cantidad)
 {
     setVida(vida - cantidad);
 }
 
-void personaje::reiniciarPersonaje()
+void Personaje::reiniciarPersonaje()
 {
     setVidasRestantes(vidasRestantes - 1);
-        if (vidasRestantes > 0) {
+    if (vidasRestantes > 0) {
         setVida(VIDA_INICIAL);
         setPos(0, 0);
     }
 }
 
-void personaje::moveLeft()
+bool Personaje::canMoveTo(qreal newX, qreal newY)
 {
-    qreal newX = x() - velocidad;
-    if (canMoveTo(newX, y())) {
-        setPos(newX, y());
-    }
-}
+    if (!scene()) return false;
 
-void personaje::moveRight()
-{
-    qreal newX = x() + velocidad;
-    if (canMoveTo(newX, y())) {
-        setPos(newX, y());
-    }
-}
+    QRectF sceneRect = scene()->sceneRect();
+    QRectF newPlayerRect(newX, newY, ancho, alto);
 
-void personaje::moveUp()
-{
-    qreal newY = y() - velocidad;
-    if (canMoveTo(x(), newY)) {
-        setPos(x(), newY);
+    if (!sceneRect.contains(newPlayerRect)) {
+        return false;
     }
-}
 
-void personaje::moveDown()
-{
-    qreal newY = y() + velocidad;
-    if (canMoveTo(x(), newY)) {
-        setPos(x(), newY);
-    }
-}
-
-bool personaje::canMoveTo(qreal newX, qreal newY)
-{
     QPointF oldPos = pos();
     setPos(newX, newY);
-
     QList<QGraphicsItem*> colliding_items = collidingItems();
-
     setPos(oldPos);
 
     for (QGraphicsItem *item : colliding_items) {
@@ -111,6 +111,5 @@ bool personaje::canMoveTo(qreal newX, qreal newY)
             return false;
         }
     }
-
     return true;
 }

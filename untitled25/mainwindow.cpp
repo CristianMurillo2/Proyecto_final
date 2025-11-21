@@ -6,6 +6,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    nivel1 = new PantallaNivel1(this);
+    setCentralWidget(nivel1);
+
+    resize(800, 600);
 }
 
 MainWindow::~MainWindow()
