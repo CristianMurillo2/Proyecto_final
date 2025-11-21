@@ -1,4 +1,5 @@
 #include "personaje.h"
+#include "isla.h"
 #include <QPixmap>
 #include <QGraphicsScene>
 #include <QPainter>
@@ -59,6 +60,7 @@ void Personaje::setVida(int nuevaVida)
 {
     vida = nuevaVida;
     if (vida > VIDA_INICIAL) vida = VIDA_INICIAL;
+
     if (vida <= 0) {
         vida = 0;
         emit personajeMuerto();
@@ -69,10 +71,7 @@ void Personaje::setVida(int nuevaVida)
 void Personaje::setVidasRestantes(int nuevasVidas)
 {
     vidasRestantes = nuevasVidas;
-    if (vidasRestantes < 0) {
-        vidasRestantes = 0;
-        emit gameOver();
-    }
+    if (vidasRestantes < 0) vidasRestantes = 0;
     emit vidasCambiadas(vidasRestantes);
 }
 
@@ -93,7 +92,6 @@ void Personaje::reiniciarPersonaje()
 bool Personaje::canMoveTo(qreal newX, qreal newY)
 {
     if (!scene()) return false;
-
     QRectF sceneRect = scene()->sceneRect();
     QRectF newPlayerRect(newX, newY, ancho, alto);
 
@@ -107,9 +105,13 @@ bool Personaje::canMoveTo(qreal newX, qreal newY)
     setPos(oldPos);
 
     for (QGraphicsItem *item : colliding_items) {
-        if (item->type() == QGraphicsRectItem::Type) {
+        if (dynamic_cast<QGraphicsRectItem*>(item)) {
+            return false;
+        }
+        if (dynamic_cast<Isla*>(item)) {
             return false;
         }
     }
+
     return true;
 }
