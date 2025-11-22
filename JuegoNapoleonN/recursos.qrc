@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>recursos/cannon1-1.png</file>
+        <file>recursos/cannon2-2.png</file>
+        <file>recursos/fondo nivel-2.jpeg</file>
+        <file>recursos/humo.png</file>
+        <file>recursos/tienda de campana1.png</file>
+        <file>recursos/tienda2.png</file>
+        <file>recursos/base.png</file>
+        <file>recursos/PortadaNapoleon.gif</file>
+    </qresource>
+</RCC>

@@ -2,11 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QMediaPlayer>
-#include <QAudioOutput>
-#include <QVideoSink>
-#include <QVideoFrame>
 #include <QPainter>
+#include <QMovie>
+#include <QLabel>
 #include "pantallanivel1.h"
 #include "pantallanivel2.h"
 #include "pantallanivel3.h"
@@ -24,7 +22,7 @@ public:
     ~MainWindow();
 
 protected:
-    void paintEvent(QPaintEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 private slots:
     void on_btnNivel1_clicked();
@@ -35,15 +33,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-
-    QMediaPlayer *m_player;
-    QAudioOutput *m_audioOutput;
-    QVideoSink *m_videoSink;
-    QVideoFrame m_currentFrame;
-
-    QMediaPlayer *m_musicaPlayer;
-    QAudioOutput *m_musicaOutput;
-
+    QMovie *m_gifAnimacion;
+    QLabel *m_fondoLabel;
     pantallaNivel1 *pantalla1;
     pantallaNivel2 *pantalla2;
     pantallaNivel3 *pantalla3;

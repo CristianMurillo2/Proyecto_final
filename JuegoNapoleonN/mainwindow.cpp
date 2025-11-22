@@ -11,33 +11,15 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    m_player = new QMediaPlayer(this);
-    m_audioOutput = new QAudioOutput(this);
-    m_videoSink = new QVideoSink(this);
+    m_gifAnimacion = new QMovie(":/recursos/PortadaNapoleon.gif");
 
-    m_player->setAudioOutput(m_audioOutput);
-    m_player->setVideoSink(m_videoSink);
+    m_fondoLabel = new QLabel(this);
+    m_fondoLabel->setScaledContents(true);
+    m_fondoLabel->resize(this->size());
+    m_fondoLabel->lower();
 
-    connect(m_videoSink, &QVideoSink::videoFrameChanged, this, [this](const QVideoFrame &frame){
-        m_currentFrame = frame;
-        this->update();
-    });
-
-    QString rutaVideo = "C:/Users/rgome/OneDrive/Documentos/Qt Informatica 2/Proyecto final/GitHub/JuegoNapoleonN/PortadaNapoleon.mp4";
-    m_player->setSource(QUrl::fromLocalFile(rutaVideo));
-    m_audioOutput->setVolume(0);
-    m_player->setLoops(QMediaPlayer::Infinite);
-    m_player->play();
-
-    m_musicaPlayer = new QMediaPlayer(this);
-    m_musicaOutput = new QAudioOutput(this);
-    m_musicaPlayer->setAudioOutput(m_musicaOutput);
-
-    QString rutaMusica = "C:/Users/rgome/OneDrive/Documentos/Qt Informatica 2/Proyecto final/GitHub/JuegoNapoleonN/mi_musica.mp3";
-    m_musicaPlayer->setSource(QUrl::fromLocalFile(rutaMusica));
-    m_musicaOutput->setVolume(0.5);
-    m_musicaPlayer->setLoops(QMediaPlayer::Infinite);
-    m_musicaPlayer->play();
+    m_fondoLabel->setMovie(m_gifAnimacion);
+    m_gifAnimacion->start();
 }
 
 MainWindow::~MainWindow()
@@ -45,44 +27,60 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::paintEvent(QPaintEvent *event)
+void MainWindow::resizeEvent(QResizeEvent *event)
 {
-    QPainter painter(this);
-
-    if (m_currentFrame.isValid()) {
-        painter.drawImage(rect(), m_currentFrame.toImage());
-    } else {
-        painter.fillRect(rect(), Qt::black);
+    if (m_fondoLabel) {
+        m_fondoLabel->resize(this->size());
     }
+    QMainWindow::resizeEvent(event);
 }
 
 void MainWindow::on_btnNivel1_clicked()
 {
+    if (m_gifAnimacion) m_gifAnimacion->stop();
 
     hide();
+
     pantalla1 = new pantallaNivel1(this);
+    pantalla1->setAttribute(Qt::WA_DeleteOnClose);
     pantalla1->show();
-    connect(pantalla1, &QDialog::finished, this, &MainWindow::show);
-    pantalla1->show();
+
+    connect(pantalla1, &QDialog::finished, this, [this](){
+        this->show();
+        if (m_gifAnimacion) m_gifAnimacion->start();
+    });
 }
 
 
 void MainWindow::on_btnNivel2_clicked()
 {
-    hide();
-    pantalla2 = new pantallaNivel2(this);
-    pantalla2->show();
-    connect(pantalla2, &QDialog::finished, this, &MainWindow::show);
-    pantalla2->show();
-}
+    if (m_gifAnimacion) m_gifAnimacion->stop();
 
+    hide();
+
+    pantalla2 = new pantallaNivel2(this);
+    pantalla2->setAttribute(Qt::WA_DeleteOnClose);
+    pantalla2->show();
+
+    connect(pantalla2, &QDialog::finished, this, [this](){
+        this->show();
+        if (m_gifAnimacion) m_gifAnimacion->start();
+    });
+}
 
 void MainWindow::on_btnNivel3_clicked()
 {
+    if (m_gifAnimacion) m_gifAnimacion->stop();
+
     hide();
+
     pantalla3 = new pantallaNivel3(this);
+    pantalla3->setAttribute(Qt::WA_DeleteOnClose);
     pantalla3->show();
-    connect(pantalla3, &QDialog::finished, this, &MainWindow::show);
-    pantalla3->show();
+
+    connect(pantalla3, &QDialog::finished, this, [this](){
+        this->show();
+        if (m_gifAnimacion) m_gifAnimacion->start();
+    });
 }
 

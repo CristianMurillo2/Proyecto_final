@@ -22,6 +22,9 @@ CannonBall::CannonBall(double x, double y, double v, double a, QGraphicsScene *s
 
 CannonBall::~CannonBall()
 {
+    if (m_timer) {
+        m_timer->stop();
+    }
     delete m_fisica;
 }
 
@@ -51,3 +54,4 @@ void CannonBall::actualizarPosicion()
         qDebug() << "Impacto en X:" << newX;
     }
 }
+

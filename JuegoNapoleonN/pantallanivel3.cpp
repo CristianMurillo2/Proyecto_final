@@ -6,6 +6,7 @@ pantallaNivel3::pantallaNivel3(QWidget *parent)
     , ui(new Ui::pantallaNivel3)
 {
     ui->setupUi(this);
+    setAttribute(Qt::WA_DeleteOnClose);
 }
 
 pantallaNivel3::~pantallaNivel3()
