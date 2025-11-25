@@ -26,6 +26,7 @@ public slots:
     void generarIsla();
     void manejarMuerte();
     void reanudarSpawns();
+    void actualizarCronometro();
 
 private:
     void crearEscenario();
@@ -37,10 +38,13 @@ private:
     PersonajeNivel1 *jugador;
     QTimer *gameTimer;
     QTimer *spawnTimer;
-    QTimer *islaTimer;
+    QTimer *islaTimer;    
+    QTimer *timerCronometro;
+    int tiempoRestante;
     QGraphicsTextItem *textoVida;
     QGraphicsTextItem *textoVidas;
     QGraphicsTextItem *textoGameOver;
+    QGraphicsTextItem *textoCronometro;
     QList<TipoDisparo> bolsaDisparos;
 };
 

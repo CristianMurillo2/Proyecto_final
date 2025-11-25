@@ -1,5 +1,6 @@
 #include "personaje.h"
 #include "isla.h"
+#include "cajaArma.h"
 #include <QPixmap>
 #include <QGraphicsScene>
 #include <QPainter>
@@ -95,6 +96,7 @@ bool Personaje::canMoveTo(qreal newX, qreal newY)
     QRectF sceneRect = scene()->sceneRect();
     QRectF newPlayerRect(newX, newY, ancho, alto);
 
+    // Verificar límites de la pantalla
     if (!sceneRect.contains(newPlayerRect)) {
         return false;
     }
@@ -105,13 +107,17 @@ bool Personaje::canMoveTo(qreal newX, qreal newY)
     setPos(oldPos);
 
     for (QGraphicsItem *item : colliding_items) {
-        if (dynamic_cast<QGraphicsRectItem*>(item)) {
-            return false;
+        if (dynamic_cast<CajaArma*>(item)) {
+            continue;
         }
+
         if (dynamic_cast<Isla*>(item)) {
             return false;
         }
-    }
 
+        if (dynamic_cast<QGraphicsRectItem*>(item)) {
+            return false;
+        }
+    }
     return true;
 }

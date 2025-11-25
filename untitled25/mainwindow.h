@@ -3,7 +3,8 @@
 
 #include <QMainWindow>
 #include "pantallanivel1.h"
-
+#include <QScreen>
+#include <QGuiApplication>
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -21,5 +22,6 @@ public:
 private:
     Ui::MainWindow *ui;
     PantallaNivel1 *nivel1;
+    void centrarVentana();
 };
 #endif // MAINWINDOW_H

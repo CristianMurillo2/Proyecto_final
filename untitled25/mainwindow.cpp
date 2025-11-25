@@ -1,18 +1,27 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "PantallaNivel3.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
-    nivel1 = new PantallaNivel1(this);
-    setCentralWidget(nivel1);
+    PantallaNivel1 *nivel = new PantallaNivel1(this);
+    setCentralWidget(nivel);
+    resize(1280, 720);
 
-    resize(800, 600);
+    centrarVentana();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+void MainWindow::centrarVentana()
+{
+    QRect screenGeometry = QGuiApplication::primaryScreen()->availableGeometry();
+
+    int x = (screenGeometry.width() - width()) / 2;
+    int y = (screenGeometry.height() - height()) / 2;
+    move(x, y);
 }

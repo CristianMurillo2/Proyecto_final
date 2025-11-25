@@ -32,6 +32,10 @@ PantallaNivel1::PantallaNivel1(QWidget *parent) : QWidget(parent)
     islaTimer = new QTimer(this);
     connect(islaTimer, &QTimer::timeout, this, &PantallaNivel1::generarIsla);
     islaTimer->start(2500);
+    tiempoRestante = 60;
+    timerCronometro = new QTimer(this);
+    connect(timerCronometro, &QTimer::timeout, this, &PantallaNivel1::actualizarCronometro);
+    timerCronometro->start(1000);
 }
 TipoDisparo PantallaNivel1::obtenerSiguienteDisparo()
 {
@@ -51,7 +55,6 @@ void PantallaNivel1::crearEscenario()
 {
     scene->setSceneRect(0, 0, 800, 600);
     view->setBackgroundBrush(QBrush(QColorConstants::Svg::lightblue));
-
     jugador = new PersonajeNivel1();
     jugador->setVelocidadMax(8.0);
     jugador->setTamano(70,70);
@@ -81,6 +84,14 @@ void PantallaNivel1::crearHUD()
     textoVidas->setDefaultTextColor(Qt::black);
     textoVidas->setFont(QFont("Arial", 14, QFont::Bold));
     scene->addItem(textoVidas);
+
+    textoCronometro = new QGraphicsTextItem();
+    textoCronometro->setPos(350, 10);
+    textoCronometro->setZValue(50);
+    textoCronometro->setDefaultTextColor(Qt::darkBlue);
+    textoCronometro->setFont(QFont("Arial", 20, QFont::Bold));
+    textoCronometro->setPlainText("TIEMPO: " + QString::number(tiempoRestante));
+    scene->addItem(textoCronometro);
 
     connect(jugador, &Personaje::vidaCambiada, this, &PantallaNivel1::actualizarVida);
     connect(jugador, &Personaje::vidasCambiadas, this, &PantallaNivel1::actualizarVidas);
@@ -155,6 +166,11 @@ void PantallaNivel1::manejarMuerte()
         mostrarGameOver();
     }
 }
+void PantallaNivel1::actualizarCronometro()
+{
+    tiempoRestante--;
+    textoCronometro->setPlainText("TIEMPO: " + QString::number(tiempoRestante));
+}
 
 void PantallaNivel1::reanudarSpawns()
 {
@@ -163,11 +179,27 @@ void PantallaNivel1::reanudarSpawns()
     }
 }
 
+
+void PantallaNivel1::generarIsla()
+{
+
+    if (!gameTimer->isActive()) return;
+    int tamano = QRandomGenerator::global()->bounded(50, 151);
+    int x = QRandomGenerator::global()->bounded(0, 800 - tamano);
+    qreal velocidad = QRandomGenerator::global()->bounded(2, 6);
+    Isla *nuevaIsla = new Isla(x, tamano, velocidad);
+    nuevaIsla->setZValue(1);
+
+    scene->addItem(nuevaIsla);
+}
 void PantallaNivel1::mostrarGameOver()
 {
     gameTimer->stop();
     spawnTimer->stop();
+    islaTimer->stop();
+    timerCronometro->stop();
     jugador->clearFocus();
+
     QGraphicsRectItem *fondo = new QGraphicsRectItem(0, 0, 800, 600);
     fondo->setBrush(QBrush(QColor(0, 0, 0, 180)));
     fondo->setZValue(100);
@@ -184,16 +216,4 @@ void PantallaNivel1::mostrarGameOver()
     textoGameOver->setPos(tx, ty);
 
     scene->addItem(textoGameOver);
-}
-void PantallaNivel1::generarIsla()
-{
-
-    if (!gameTimer->isActive()) return;
-    int tamano = QRandomGenerator::global()->bounded(50, 151);
-    int x = QRandomGenerator::global()->bounded(0, 800 - tamano);
-    qreal velocidad = QRandomGenerator::global()->bounded(2, 6);
-    Isla *nuevaIsla = new Isla(x, tamano, velocidad);
-    nuevaIsla->setZValue(1);
-
-    scene->addItem(nuevaIsla);
 }
