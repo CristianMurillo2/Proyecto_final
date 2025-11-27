@@ -9,19 +9,22 @@
 Arma::Arma(qreal x, qreal y, qreal dirX, qreal dirY, int rango, bool perforante, bool esDelEnemigo, QGraphicsItem *parent)
     : QObject(nullptr), QGraphicsPixmapItem(parent), esPerforante(perforante), esEnemigo(esDelEnemigo)
 {
-    QPixmap pixmap(10, 10);
-    pixmap.fill(Qt::transparent);
-    QPainter p(&pixmap);
+    QString rutaImagen = "C:\\Users\\crist\\OneDrive\\Escritorio\\proyecto final\\build-untitled25-Desktop_Qt_6_5_3_MinGW_64_bit-Debug\\imagenes_barco\\PNG\\Retina\\Ship parts\\cannonBall.png";
 
-    if (esEnemigo) p.setBrush(Qt::darkMagenta);
-    else p.setBrush(esPerforante ? Qt::red : Qt::yellow);
+    QPixmap skin(rutaImagen);
 
-    p.setPen(Qt::NoPen);
-    p.drawEllipse(0, 0, 10, 10);
-    p.end();
-    setPixmap(pixmap);
+    int tamano = 15;
+
+    if (skin.isNull()) {
+        skin = QPixmap(tamano, tamano);
+        skin.fill(esEnemigo ? Qt::magenta : Qt::yellow);
+    }
+    setPixmap(skin.scaled(tamano, tamano, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    setTransformOriginPoint(boundingRect().center());
+
     setPos(x, y);
-
+    qreal anguloRad = qAtan2(dirY, dirX);
+    setRotation(qRadiansToDegrees(anguloRad));
     qreal velocidad = esEnemigo ? 6.0 : (esPerforante ? 20.0 : 10.0);
     qreal longitud = qSqrt(dirX*dirX + dirY*dirY);
 

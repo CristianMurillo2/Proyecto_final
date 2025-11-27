@@ -11,11 +11,22 @@ PersonajeNivel3::PersonajeNivel3(QGraphicsItem *parent)
     : Personaje(parent), w(false), a(false), s(false), d(false),
     ultimaDirX(0), ultimaDirY(1), puedeDisparar(true)
 {
-    QPixmap skin(40, 40); skin.fill(Qt::transparent); QPainter p(&skin);
-    p.setBrush(Qt::cyan); p.setPen(QPen(Qt::black, 2)); p.drawRect(2, 2, 36, 36); p.end();
-    setPixmap(skin);
-    setVelocidadMax(5.0);
+    QPixmap hojaCompleta("C:\\Users\\crist\\OneDrive\\Escritorio\\proyecto final\\build-untitled25-Desktop_Qt_6_5_3_MinGW_64_bit-Debug\\personaje.png");
 
+    int x = 150;
+    int y = 725;
+    int w = 148;
+    int h = 274;
+    QPixmap skin;
+    if (hojaCompleta.isNull()) {
+        skin = QPixmap(80, 80); skin.fill(Qt::cyan);
+    } else {
+        skin = hojaCompleta.copy(x, y, w, h);
+    }
+
+    setPixmap(skin.scaled(80, 80, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    setTransformOriginPoint(boundingRect().center());
+    setVelocidadMax(5.0);
     armaActual = NORMAL;
     tiempoCooldown = 400;
     vida = 3;
@@ -79,14 +90,17 @@ void PersonajeNivel3::actualizarMovimiento()
     if (a) dx -= 1;
     if (d) dx += 1;
 
+    if (dx < 0) {
+        setTransform(QTransform::fromScale(-1, 1));
+    } else if (dx > 0) {
+        setTransform(QTransform());
+    }
     if (dx != 0 || dy != 0) {
         ultimaDirX = dx;
         ultimaDirY = dy;
     }
-
     qreal moveX = dx * velocidadMax;
     qreal moveY = dy * velocidadMax;
-
     if (moveX != 0 && canMoveTo(x() + moveX, y())) {
         setPos(x() + moveX, y());
     }
@@ -120,39 +134,55 @@ void PersonajeNivel3::restaurarArma()
 
 void PersonajeNivel3::disparar()
 {
-    if (!scene()) return;
+    {
+        if (!scene()) return;
 
-    if (sonidoDisparo->isPlaying()) sonidoDisparo->stop();
-    sonidoDisparo->play();
+        if (sonidoDisparo->isPlaying()) sonidoDisparo->stop();
+        sonidoDisparo->play();
 
-    qreal cx = x() + boundingRect().width() / 2 - 5;
-    qreal cy = y() + boundingRect().height() / 2 - 5;
-    int rangoNormal = 40;
-    int rangoEscopeta = 55;
-    int rangoMetralleta = 60;
-    int rangoSniper = 90;
+        qreal cx = x() + boundingRect().width() / 2 - 5;
+        qreal cy = y() + boundingRect().height() / 2 - 5;
+        qreal centroX = x() + boundingRect().width() / 2;
+        qreal centroY = y() + boundingRect().height() / 2;
+        qreal desfaseX = 40.0;
+        qreal desfaseY = 12.0;
+        qreal salidaX = centroX;
+        qreal salidaY = centroY + desfaseY;
+        if (ultimaDirX < 0) {
+            salidaX = centroX - desfaseX;
+        } else {
+            salidaX = centroX + desfaseX;
+        }
 
-    if (armaActual == ESCOPETA) {
-        scene()->addItem(new Arma(cx, cy, ultimaDirX, ultimaDirY, rangoEscopeta, false, false));
-        double angulo = 0.3;
-        qreal izqX = ultimaDirX * qCos(-angulo) - ultimaDirY * qSin(-angulo);
-        qreal izqY = ultimaDirX * qSin(-angulo) + ultimaDirY * qCos(-angulo);
-        scene()->addItem(new Arma(cx, cy, izqX, izqY, rangoEscopeta, false, false));
-        qreal derX = ultimaDirX * qCos(angulo) - ultimaDirY * qSin(angulo);
-        qreal derY = ultimaDirX * qSin(angulo) + ultimaDirY * qCos(angulo);
-        scene()->addItem(new Arma(cx, cy, derX, derY, rangoEscopeta, false, false));
-    }
-    else if (armaActual == SNIPER) {
-        scene()->addItem(new Arma(cx, cy, ultimaDirX, ultimaDirY, rangoSniper, true, false));
-    }
-    else if (armaActual == METRALLETA) {
-        scene()->addItem(new Arma(cx, cy, ultimaDirX, ultimaDirY, rangoMetralleta, false, false));
-    }
-    else {
-        scene()->addItem(new Arma(cx, cy, ultimaDirX, ultimaDirY, rangoNormal, false, false));
-    }
+        salidaX -= 7.5;
+        salidaY -= 7.5;
+        int rangoNormal = 40;
+        int rangoEscopeta = 55;
+        int rangoMetralleta = 60;
+        int rangoSniper = 90;
 
+        if (armaActual == ESCOPETA) {
+            scene()->addItem(new Arma(salidaX, salidaY, ultimaDirX, ultimaDirY, 55, false, false));
+
+            double angulo = 0.3;
+            qreal ix = ultimaDirX * qCos(-angulo) - ultimaDirY * qSin(-angulo);
+            qreal iy = ultimaDirX * qSin(-angulo) + ultimaDirY * qCos(-angulo);
+            scene()->addItem(new Arma(salidaX, salidaY, ix, iy, 55, false, false));
+
+            qreal dx = ultimaDirX * qCos(angulo) - ultimaDirY * qSin(angulo);
+            qreal dy = ultimaDirX * qSin(angulo) + ultimaDirY * qCos(angulo);
+            scene()->addItem(new Arma(salidaX, salidaY, dx, dy, 55, false, false));
+        }
+        else if (armaActual == SNIPER) {
+            scene()->addItem(new Arma(salidaX, salidaY, ultimaDirX, ultimaDirY, 90, true, false));
+        }
+        else if (armaActual == METRALLETA) {
+            scene()->addItem(new Arma(salidaX, salidaY, ultimaDirX, ultimaDirY, 60, false, false));
+        }
+        else {
+            scene()->addItem(new Arma(salidaX, salidaY, ultimaDirX, ultimaDirY, 40, false, false));
+        }
     puedeDisparar = false;
     QTimer::singleShot(tiempoCooldown, [this](){ puedeDisparar = true; });
-}
+    }}
 

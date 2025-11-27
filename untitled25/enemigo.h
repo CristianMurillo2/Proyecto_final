@@ -25,6 +25,7 @@ private:
     int vida;
     qreal velocidad;
     int tiempoVivo;
+    bool chocaConMuro();
 
     QTimer *timerIA;
     QTimer *timerDisparo;

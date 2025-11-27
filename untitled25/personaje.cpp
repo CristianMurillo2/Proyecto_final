@@ -95,8 +95,6 @@ bool Personaje::canMoveTo(qreal newX, qreal newY)
     if (!scene()) return false;
     QRectF sceneRect = scene()->sceneRect();
     QRectF newPlayerRect(newX, newY, ancho, alto);
-
-    // Verificar límites de la pantalla
     if (!sceneRect.contains(newPlayerRect)) {
         return false;
     }

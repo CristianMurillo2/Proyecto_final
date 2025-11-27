@@ -63,8 +63,19 @@ void PantallaNivel3::crearEscenario()
     int ancho = 1280;
     int alto = 720;
     scene->setSceneRect(0, 0, ancho, alto);
+    QPixmap imagenFondo("C:\\Users\\crist\\OneDrive\\Escritorio\\proyecto final\\build-untitled25-Desktop_Qt_6_5_3_MinGW_64_bit-Debug\\fondo.png");
 
-    view->setBackgroundBrush(QBrush(QColor(50, 50, 60)));
+    if (imagenFondo.isNull()) {
+        view->setBackgroundBrush(QBrush(QColor(50, 50, 60)));
+    }
+    else {
+        imagenFondo = imagenFondo.scaled(ancho, alto, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        QGraphicsPixmapItem *itemFondo = new QGraphicsPixmapItem(imagenFondo);
+
+        itemFondo->setPos(0, 0);
+        itemFondo->setZValue(-100);
+        scene->addItem(itemFondo);
+    }
 
     jugador = new PersonajeNivel3();
     jugador->setPos(ancho/2 - 20, alto/2 - 20);
