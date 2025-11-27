@@ -26,6 +26,11 @@ private:
     qreal velocidad;
     int tiempoVivo;
     bool chocaConMuro();
+    enum EstadoIA {
+        ENTRANDO,
+        COMBATE
+    };
+    EstadoIA estadoActual;
 
     QTimer *timerIA;
     QTimer *timerDisparo;

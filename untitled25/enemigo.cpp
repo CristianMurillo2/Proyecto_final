@@ -27,7 +27,7 @@ Enemigo::Enemigo(PersonajeNivel3* objetivo, QGraphicsItem *parent)
     vida = 3;
     velocidad = 2.0;
     tiempoVivo = 0;
-
+    estadoActual = ENTRANDO;
     timerIA = new QTimer(this);
     connect(timerIA, &QTimer::timeout, this, &Enemigo::mover);
     timerIA->start(30);
@@ -83,28 +83,62 @@ void Enemigo::mover()
     if (tiempoVivo == 200) {
         velocidad += 1.5;
         setOpacity(0.7);
+        timerDisparo->setInterval(1500);
     }
     qreal dx = target->x() - x();
     qreal dy = target->y() - y();
+    qreal distancia = qSqrt(dx*dx + dy*dy);
     if (dx < 0) setTransform(QTransform::fromScale(-1, 1));
     else setTransform(QTransform());
-
+    qreal vx = 0;
+    qreal vy = 0;
     qreal angulo = qAtan2(dy, dx);
-    qreal vx = qCos(angulo) * velocidad;
-    qreal vy = qSin(angulo) * velocidad;
 
+
+    if (estadoActual == ENTRANDO) {
+        qreal centroDX = 640 - x();
+        qreal centroDY = 360 - y();
+        qreal anguloCentro = qAtan2(centroDY, centroDX);
+
+        vx = qCos(anguloCentro) * velocidad;
+        vy = qSin(anguloCentro) * velocidad;
+
+        if (x() > 50 && x() < 1230 && y() > 50 && y() < 670) {
+            estadoActual = COMBATE;
+        }
+    }
+    else if (estadoActual == COMBATE) {
+
+        qreal anguloJugador = qAtan2(dy, dx);
+
+        if (distancia > 300) {
+            vx = qCos(anguloJugador) * velocidad;
+            vy = qSin(anguloJugador) * velocidad;
+        }
+        else if (distancia < 150) {
+            vx = -qCos(anguloJugador) * (velocidad * 0.8);
+            vy = -qSin(anguloJugador) * (velocidad * 0.8);
+        }
+        else {
+
+            vx = qCos(anguloJugador + 1.57) * (velocidad * 0.5);
+            vy = qSin(anguloJugador + 1.57) * (velocidad * 0.5);
+        }
+    }
+    if (estadoActual == ENTRANDO) {
+        setPos(x() + vx, y() + vy);
+        return;
+    }
     QPointF posOriginal = pos();
-    bool estabaFuera = (posOriginal.x() < 5 || posOriginal.x() > 1275 ||
-                        posOriginal.y() < 5 || posOriginal.y() > 700);
-
     setPos(x() + vx, y() + vy);
 
-    if (!estabaFuera && chocaConMuro()) {
-
+    if (chocaConMuro()) {
         setPos(posOriginal);
+
         setPos(x() + vx, y());
         if (chocaConMuro()) {
             setPos(posOriginal);
+
             setPos(x(), y() + vy);
             if (chocaConMuro()) {
                 setPos(posOriginal);
