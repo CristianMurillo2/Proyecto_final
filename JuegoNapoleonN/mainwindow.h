@@ -35,9 +35,10 @@ private:
     Ui::MainWindow *ui;
     QMovie *m_gifAnimacion;
     QLabel *m_fondoLabel;
-    pantallaNivel1 *pantalla1;
+    PantallaNivel1 *nivel1;
     pantallaNivel2 *pantalla2;
-    pantallaNivel3 *pantalla3;
+    PantallaNivel3 *pantalla3;
+    void centrarVentana();
 };
 
 #endif // MAINWINDOW_H

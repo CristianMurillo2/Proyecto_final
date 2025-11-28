@@ -2,24 +2,54 @@
 #define PANTALLANIVEL1_H
 
 #include <QDialog>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QTimer>
+#include <QGraphicsTextItem>
+#include <QTimer>
+#include <QList>
+#include <QKeyEvent>
+#include "balacanon.h"
+#include "PersonajeNivel1.h"
+#include "isla.h"
 
-namespace Ui {
-class pantallaNivel1;
-}
-
-class pantallaNivel1 : public QDialog
+class PantallaNivel1 : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit pantallaNivel1(QWidget *parent = nullptr);
-    ~pantallaNivel1();
+    explicit PantallaNivel1(QWidget *parent = nullptr);
 
-private slots:
-    void on_pushButton_clicked();
+public slots:
+    void actualizarVida(int vida);
+    void actualizarVidas(int vidas);
+    void generarBala();
+    void generarIsla();
+    void manejarMuerte();
+    void reanudarSpawns();
+    void actualizarCronometro();
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
 
 private:
-    Ui::pantallaNivel1 *ui;
+    void crearEscenario();
+    void crearHUD();
+    void mostrarGameOver();
+    TipoDisparo obtenerSiguienteDisparo();
+    QGraphicsScene *scene;
+    QGraphicsView *view;
+    PersonajeNivel1 *jugador;
+    QTimer *gameTimer;
+    QTimer *spawnTimer;
+    QTimer *islaTimer;
+    QTimer *timerCronometro;
+    int tiempoRestante;
+    QGraphicsTextItem *textoVida;
+    QGraphicsTextItem *textoVidas;
+    QGraphicsTextItem *textoGameOver;
+    QGraphicsTextItem *textoCronometro;
+    QList<TipoDisparo> bolsaDisparos;
 };
 
-#endif // PANTALLANIVEL1_H
+#endif

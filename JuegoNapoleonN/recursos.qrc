@@ -8,5 +8,17 @@
         <file>recursos/tienda2.png</file>
         <file>recursos/base.png</file>
         <file>recursos/PortadaNapoleon.gif</file>
+        <file>recursos/bandera de francia.png</file>
+        <file>recursos/bandera britanica.png</file>
+        <file>recursos/barco.png</file>
+        <file>recursos/cannonBall.png</file>
+        <file>recursos/tiles_sheet.png</file>
+        <file>recursos/enemigos.png</file>
+        <file>recursos/napoleon.png</file>
+        <file>recursos/mapanivel3.jpeg</file>
+        <file>recursos/cajaArmas.png</file>
+        <file>recursos/MA_Pereveslo_We_Are_All_Leaders.wav</file>
+        <file>recursos/pick-up-sfx-38516.wav</file>
+        <file>recursos/pistol-shot-233473.wav</file>
     </qresource>
 </RCC>

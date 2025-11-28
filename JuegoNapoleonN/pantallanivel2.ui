@@ -102,7 +102,7 @@
         </font>
        </property>
        <property name="text">
-        <string>40</string>
+        <string>50</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
