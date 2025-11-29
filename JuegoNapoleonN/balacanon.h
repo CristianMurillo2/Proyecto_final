@@ -31,7 +31,7 @@ private:
     qreal alto;
     QTimer *timerMovimiento;
     int dano;
-
+    static QPixmap* texturaBala;
     TipoDisparo tipoMovimiento;
     double tiempoVida;
     qreal baseVX, baseVY;

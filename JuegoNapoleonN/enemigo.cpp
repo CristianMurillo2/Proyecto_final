@@ -8,7 +8,7 @@
 Enemigo::Enemigo(PersonajeNivel3* objetivo, QGraphicsItem *parent)
     : QObject(nullptr), QGraphicsPixmapItem(parent), target(objetivo)
 {
-    QPixmap hojaCompleta(":/recursos/enemigos.png");
+    static QPixmap hojaCompleta(":/recursos/enemigos.png");
 
     int x = 540;
     int y = 791;
@@ -44,7 +44,7 @@ void Enemigo::recibirDano(int cantidad)
     if (vida <= 0) {
         emit enemigoMuerto();
         if (scene()) scene()->removeItem(this);
-        delete this;
+        this->deleteLater();
     }
 }
 

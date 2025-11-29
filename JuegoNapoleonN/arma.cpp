@@ -56,7 +56,7 @@ void Arma::mover()
 
         if (dynamic_cast<QGraphicsRectItem*>(item) && !dynamic_cast<Arma*>(item)) {
             if (scene()) scene()->removeItem(this);
-            delete this;
+            this->deleteLater();
             return;
         }
 
@@ -65,7 +65,7 @@ void Arma::mover()
             if (jugador) {
                 jugador->recibirDano();
                 if (scene()) scene()->removeItem(this);
-                delete this;
+                this->deleteLater();
                 return;
             }
         }
@@ -76,7 +76,7 @@ void Arma::mover()
                 enemigo->recibirDano(getDano());
                 if (!esPerforante) {
                     if (scene()) scene()->removeItem(this);
-                    delete this;
+                    this->deleteLater();
                     return;
                 }
             }
@@ -86,6 +86,6 @@ void Arma::mover()
     pasosRestantes--;
     if (pasosRestantes <= 0 || x() < -50 || x() > 1300 || y() < -50 || y() > 800) {
         if (scene()) scene()->removeItem(this);
-        delete this;
+        this->deleteLater();
     }
 }

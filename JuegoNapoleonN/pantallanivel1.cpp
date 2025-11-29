@@ -168,7 +168,7 @@ void PantallaNivel1::manejarMuerte()
         QTimer::singleShot(4000, this, &PantallaNivel1::reanudarSpawns);
     }
     else {
-        mostrarGameOver();
+        mostrarGameOver(false);
     }
 }
 void PantallaNivel1::actualizarCronometro()
@@ -181,7 +181,7 @@ void PantallaNivel1::actualizarCronometro()
         spawnTimer->stop();
         islaTimer->stop();
         timerCronometro->stop();
-        this->close();
+        mostrarGameOver(true);
     }
 }
 
@@ -205,29 +205,30 @@ void PantallaNivel1::generarIsla()
 
     scene->addItem(nuevaIsla);
 }
-void PantallaNivel1::mostrarGameOver()
+void PantallaNivel1::mostrarGameOver(bool ganado)
 {
     gameTimer->stop();
     spawnTimer->stop();
     islaTimer->stop();
-    timerCronometro->stop();
-    jugador->clearFocus();
+    if (timerCronometro) timerCronometro->stop();
+    if (jugador) jugador->clearFocus();
 
-    QGraphicsRectItem *fondo = new QGraphicsRectItem(0, 0, 800, 600);
-    fondo->setBrush(Qt::transparent);
-    fondo->setZValue(100);
-    scene->addItem(fondo);
-
-    textoGameOver = new QGraphicsTextItem("GAME OVER");
+    QRectF bounds = scene->sceneRect();
+    QGraphicsRectItem *fondoOscuro = new QGraphicsRectItem(bounds);
+    fondoOscuro->setBrush(QColor(0, 0, 0, 150));
+    fondoOscuro->setZValue(99);
+    scene->addItem(fondoOscuro);
+    QString mensaje = ganado ? "¡GANASTE!" : "GAME OVER";
+    QColor colorTexto = ganado ? Qt::green : Qt::red;
+    QGraphicsSimpleTextItem *textoFinal = new QGraphicsSimpleTextItem(mensaje);
     QFont fuente("Arial", 50, QFont::Bold);
-    textoGameOver->setFont(fuente);
-    textoGameOver->setDefaultTextColor(Qt::white);
-    textoGameOver->setZValue(101);
-
-    qreal tx = (800 - textoGameOver->boundingRect().width()) / 2;
-    qreal ty = (600 - textoGameOver->boundingRect().height()) / 2;
-    textoGameOver->setPos(tx, ty);
-    scene->addItem(textoGameOver);
+    textoFinal->setFont(fuente);
+    textoFinal->setBrush(QBrush(colorTexto));
+    textoFinal->setZValue(100);
+    QRectF rectTexto = textoFinal->boundingRect();
+    QPointF centro = bounds.center();
+    textoFinal->setPos(centro.x() - (rectTexto.width() / 2), centro.y() - (rectTexto.height() / 2));
+    scene->addItem(textoFinal);
     QTimer::singleShot(3000, this, &PantallaNivel1::close);
 }
 

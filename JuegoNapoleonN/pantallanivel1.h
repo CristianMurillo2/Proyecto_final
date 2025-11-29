@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <QList>
 #include <QKeyEvent>
+#include <QGraphicsSimpleTextItem>
 #include "balacanon.h"
 #include "PersonajeNivel1.h"
 #include "isla.h"
@@ -35,7 +36,7 @@ protected:
 private:
     void crearEscenario();
     void crearHUD();
-    void mostrarGameOver();
+    void mostrarGameOver(bool ganado);
     TipoDisparo obtenerSiguienteDisparo();
     QGraphicsScene *scene;
     QGraphicsView *view;

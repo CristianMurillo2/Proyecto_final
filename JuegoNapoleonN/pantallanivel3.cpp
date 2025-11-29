@@ -321,6 +321,7 @@ void PantallaNivel3::detenerJuego()
     timerSpawns->stop();
     if(musicaFondo) musicaFondo->stop();
     jugador->clearFocus();
+
     QGraphicsTextItem *textoGO = new QGraphicsTextItem("GAME OVER");
     QFont fuente("Arial", 50, QFont::Bold);
     textoGO->setFont(fuente);

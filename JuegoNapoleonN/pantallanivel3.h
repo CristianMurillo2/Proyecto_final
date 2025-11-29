@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QList>
 #include <QGraphicsTextItem>
+#include <QGraphicsPixmapItem>
 #include <QSoundEffect>
 #include "personajenivel3.h"
 #include "cajaArma.h"

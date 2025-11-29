@@ -10,7 +10,7 @@ CajaArma::CajaArma(qreal x, qreal y, TipoArma tipo)
     : tipoCaja(tipo)
 {
     QString rutaHoja = ":/recursos/cajaArmas.png";
-    QPixmap hojaCompleta(rutaHoja);
+    static QPixmap hojaCompleta(rutaHoja);
 
     QPixmap spriteFinal;
     QColor colorRespaldo;
@@ -82,7 +82,7 @@ void CajaArma::verificarColision()
         if (jugador) {
             jugador->cambiarArma(tipoCaja, 10000);
             if (scene()) scene()->removeItem(this);
-            delete this;
+            this->deleteLater();
             return;
         }
     }

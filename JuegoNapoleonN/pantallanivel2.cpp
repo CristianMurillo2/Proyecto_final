@@ -1,13 +1,10 @@
 #include "pantallanivel2.h"
 #include "ui_pantallanivel2.h"
-#include <QGraphicsTextItem>
-#include <QFont>
-#include <QDebug>
+
 
 pantallaNivel2::pantallaNivel2(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::pantallaNivel2)
-    , m_bola(nullptr)
     , m_scene(nullptr)
     , cannon(nullptr)
     , base(nullptr)
@@ -40,13 +37,11 @@ pantallaNivel2::pantallaNivel2(QWidget *parent)
 void pantallaNivel2::iniciarNivel(){
 
     m_scene->clear();
-    m_bola = nullptr;
+    m_balas.clear();
     cannon = nullptr;
     base = nullptr;
     obst.clear();
-    tiempoRestante = 50;
-    ui->lblTiempo->setText(QString::number(tiempoRestante));
-    m_bola = nullptr;
+    tiempoRestante = 45;
 
     QImage imagen(":/recursos/fondo nivel-2.jpeg");
     QBrush fondo(imagen);
@@ -58,6 +53,15 @@ void pantallaNivel2::iniciarNivel(){
     cannon -> setPixmap(pixMap);
     cannon -> setScale(0.25);
     cannon -> setPos(30,-150);
+
+    musicaFondo = new QMediaPlayer(this);
+    salidaAudio = new QAudioOutput(this);
+
+    musicaFondo->setAudioOutput(salidaAudio);
+    musicaFondo->setSource(QUrl("qrc:/recursos/musicaNivel2.mp3"));
+    salidaAudio->setVolume(0.1);
+    musicaFondo->setLoops(QMediaPlayer::Infinite);
+    musicaFondo->play();
 
     QPixmap pixMap2(":/recursos/base.png");
     base = new QGraphicsPixmapItem();
@@ -101,6 +105,14 @@ void pantallaNivel2::iniciarNivel(){
     int width = this->width();
     int height = this->height();
     m_scene->setSceneRect(0, -height, width, height);
+
+    textoCronometro = new QGraphicsTextItem();
+    textoCronometro->setFont(QFont("Arial", 50, QFont::Bold));
+    textoCronometro->setDefaultTextColor(Qt::black);
+    textoCronometro->setPlainText(QString::number(tiempoRestante));
+    textoCronometro->setZValue(200);
+    m_scene->addItem(textoCronometro);
+
     imagenTiendaNormal.load(":/recursos/tienda de campana1.png");
     imagenTiendaNormal = imagenTiendaNormal.scaled(100, 67, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     imagenTiendaRota.load(":/recursos/tienda2.png");
@@ -126,21 +138,18 @@ void pantallaNivel2::on_pushButton_clicked()
 
 void pantallaNivel2::on_btnDisparar_clicked()
 {
-    if (m_bola != nullptr) {
-        if (m_scene->items().contains(m_bola)) {
-            m_scene->removeItem(m_bola);
-            delete m_bola;
-        }
-        m_bola = nullptr;
+    if (m_balas.size() >= 3) {
+        return;
     }
+
     if (sonidoDisparo) {
         sonidoDisparo->play();
     }
     double velocidad_inicial = 35.0;
     double angulo_rad = m_anguloGrados * (M_PI / 180.0);
-    m_bola = new CannonBall(140, 120, velocidad_inicial, angulo_rad, m_scene, this);
-    m_scene->addItem(m_bola);
-    ui->graphicsView->centerOn(m_bola);
+    CannonBall *nuevaBola = new CannonBall(140, 120, velocidad_inicial, angulo_rad, m_scene, this);
+    m_scene->addItem(nuevaBola);
+    m_balas.append(nuevaBola);
 
     QPixmap pixMap1(":/recursos/humo.png");
     QGraphicsPixmapItem *humo = new QGraphicsPixmapItem();
@@ -164,23 +173,38 @@ void pantallaNivel2::on_verticalSlider_valueChanged(int value)
 
 void pantallaNivel2::verificarColisiones()
 {
-    if (m_bola == nullptr) return;
-    for(int i = obst.length() - 1; i >= 0; i--){
-        QGraphicsItem* itemActual = obst.at(i);
-        if(m_bola->collidesWithItem(itemActual)){
-            QGraphicsPixmapItem* tienda = dynamic_cast<QGraphicsPixmapItem*>(itemActual);
-            if(tienda){
-                tienda->setPixmap(imagenTiendaRota);
-            }
-            obst.removeAt(i);
-            m_scene->removeItem(m_bola);
-            delete m_bola;
-            m_bola = nullptr;
-            if (obst.isEmpty()) {
-               this-> close();
-            }
-            return;
+    double limiteSuelo = 0;
+    double limiteDerecha = m_scene->sceneRect().width() + 100;
+    for (int i = m_balas.size() - 1; i >= 0; --i) {
+        CannonBall *b = m_balas[i];
+        bool balaEliminada = false;
+        if (b->y() > limiteSuelo || b->x() > limiteDerecha || b->x() < -50) {
+            m_scene->removeItem(b);
+            delete b;
+            m_balas.removeAt(i);
+            balaEliminada = true;
         }
+
+        if (balaEliminada) continue;
+        for (int j = 0; j < obst.size(); ++j) {
+            if (b->collidesWithItem(obst[j])) {
+                QPointF posicionTienda = obst[j]->pos();
+                m_scene->removeItem(obst[j]);
+                delete obst[j];
+                obst.removeAt(j);
+                QGraphicsPixmapItem *roto = new QGraphicsPixmapItem(imagenTiendaRota);
+                roto->setPos(posicionTienda);
+                m_scene->addItem(roto);
+                m_scene->removeItem(b);
+                delete b;
+                m_balas.removeAt(i);
+                balaEliminada = true;
+                break;
+            }
+        }
+    }
+    if (obst.isEmpty()) {
+        finalizarJuego(true);
     }
 }
 
@@ -192,32 +216,64 @@ void pantallaNivel2::reiniciarJuego()
 void pantallaNivel2::actualizarCronometro()
 {
     tiempoRestante--;
-    ui->lblTiempo->setText(QString::number(tiempoRestante));
-
-    if (tiempoRestante <= 0) {
-        timerJuego->stop();
-        if (timerColisiones->isActive()) timerColisiones->stop();
-
-        qDebug() << ">>> GENERANDO GAME OVER (Dinámico) <<<";
-
-        QRectF bounds = m_scene->sceneRect();
-        QPointF centro = bounds.center();
-
-        qDebug() << "Escena Rect:" << bounds << " Centro:" << centro;
-        QGraphicsRectItem *fondoOscuro = new QGraphicsRectItem(bounds);
-
-        QGraphicsSimpleTextItem *textoGO = new QGraphicsSimpleTextItem("GAME OVER");
-        QFont fuente("Arial", 50, QFont::Bold);
-        textoGO->setFont(fuente);
-        textoGO->setBrush(QBrush(Qt::red));
-        textoGO->setZValue(100);
-        QRectF rectTexto = textoGO->boundingRect();
-        qreal tx = centro.x() - (rectTexto.width() / 2);
-        qreal ty = centro.y() - (rectTexto.height() / 2);
-
-        textoGO->setPos(tx, ty);
-        m_scene->addItem(textoGO);
-
-        QTimer::singleShot(3000, this, &pantallaNivel2::close);
+    if (textoCronometro) {
+        textoCronometro->setPlainText(QString::number(tiempoRestante));
+        if (tiempoRestante <= 10) {
+            textoCronometro->setDefaultTextColor(Qt::red);
+        } else {
+            textoCronometro->setDefaultTextColor(Qt::green);
+        }
+        QRect viewportRect = ui->graphicsView->viewport()->rect();
+        QRectF visibleSceneRect = ui->graphicsView->mapToScene(viewportRect).boundingRect();
+        double tx = visibleSceneRect.center().x() - (textoCronometro->boundingRect().width() / 2);
+        double ty = visibleSceneRect.top() + 20;
+        textoCronometro->setPos(tx, ty);
     }
+    if (tiempoRestante <= 0) {
+        finalizarJuego(false);
+    }
+
+}
+
+void pantallaNivel2::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_W) {
+        int valorActual = ui->verticalSlider->value();
+        ui->verticalSlider->setValue(valorActual + 1);
+    }
+    else if (event->key() == Qt::Key_S) {
+        int valorActual = ui->verticalSlider->value();
+        ui->verticalSlider->setValue(valorActual - 1);
+    }
+    else if (event->key() == Qt::Key_Space) {
+        on_btnDisparar_clicked();
+    }
+    else {
+        QDialog::keyPressEvent(event);
+    }
+}
+
+void pantallaNivel2::finalizarJuego(bool ganado)
+{
+    if (musicaFondo) {musicaFondo->stop();}
+    if (timerJuego->isActive()) timerJuego->stop();
+    if (timerColisiones->isActive()) timerColisiones->stop();
+    QRectF bounds = m_scene->sceneRect();
+    QGraphicsRectItem *fondoOscuro = new QGraphicsRectItem(bounds);
+    fondoOscuro->setBrush(QColor(0, 0, 0, 150));
+    fondoOscuro->setZValue(99);
+    m_scene->addItem(fondoOscuro);
+    QString mensaje = ganado ? "¡GANASTE!" : "GAME OVER";
+    QColor colorTexto = ganado ? Qt::green : Qt::red;
+
+    QGraphicsSimpleTextItem *textoFinal = new QGraphicsSimpleTextItem(mensaje);
+    QFont fuente("Arial", 50, QFont::Bold);
+    textoFinal->setFont(fuente);
+    textoFinal->setBrush(QBrush(colorTexto));
+    textoFinal->setZValue(100);
+    QRectF rectTexto = textoFinal->boundingRect();
+    QPointF centro = bounds.center();
+    textoFinal->setPos(centro.x() - (rectTexto.width() / 2), centro.y() - (rectTexto.height() / 2));
+    m_scene->addItem(textoFinal);
+    QTimer::singleShot(3000, this, &pantallaNivel2::close);
 }

@@ -4,6 +4,8 @@
 #include <QGraphicsScene>
 #include <QtMath>
 
+QPixmap* BalaCanon::texturaBala = nullptr;
+
 BalaCanon::BalaCanon(qreal startX, qreal startY, qreal vX, qreal vY, TipoDisparo tipo, QGraphicsItem *parent)
     : QObject(nullptr),
     QGraphicsPixmapItem(parent),
@@ -15,10 +17,10 @@ BalaCanon::BalaCanon(qreal startX, qreal startY, qreal vX, qreal vY, TipoDisparo
 {
     baseVX = vX;
     baseVY = vY;
-
-    QPixmap sprite(":/recursos/cannonBall.png");
-
-    setPixmap(sprite.scaled(20, 20, Qt::KeepAspectRatio));
+    if (texturaBala == nullptr) {
+        texturaBala = new QPixmap(":/recursos/cannonBall.png");
+    }
+    setPixmap(texturaBala->scaled(20, 20, Qt::KeepAspectRatio));
 
     setPos(startX, startY);
     setZValue(5);
@@ -94,7 +96,7 @@ void BalaCanon::mover()
         if (jugador) {
             jugador->recibirDano(dano);
             if (scene()) scene()->removeItem(this);
-            delete this;
+            this->deleteLater();
             return;
         }
     }

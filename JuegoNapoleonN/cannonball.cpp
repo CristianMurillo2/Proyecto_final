@@ -26,6 +26,13 @@ CannonBall::~CannonBall()
         m_timer->stop();
     }
     delete m_fisica;
+    for (auto item : m_rastro) {
+        if (m_scene) {
+            m_scene->removeItem(item);
+        }
+        delete item;
+    }
+    m_rastro.clear();
 }
 
 void CannonBall::actualizarPosicion()
@@ -38,6 +45,7 @@ void CannonBall::actualizarPosicion()
 
     if (m_scene) {
         m_scene->addItem(trailDot);
+        m_rastro.append(trailDot);
     }
 
     m_fisica->calcularVelocidad();

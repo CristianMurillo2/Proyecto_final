@@ -18,6 +18,8 @@ public slots:
 private:
     QTimer *timerMovimiento;
     qreal velocidad;
+    static QPixmap *texturaIsla1;
+    static QPixmap *texturaIsla2;
 };
 
 #endif

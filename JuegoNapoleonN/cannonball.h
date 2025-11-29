@@ -4,6 +4,7 @@
 #include <QGraphicsEllipseItem>
 #include <QTimer>
 #include <QGraphicsScene>
+#include <QList>
 #include "movimientoparticula.h"
 
 class CannonBall : public QObject, public QGraphicsEllipseItem
@@ -21,6 +22,7 @@ private:
     movimientoParticula *m_fisica;
     QTimer *m_timer;
     QGraphicsScene *m_scene;
+    QList<QGraphicsItem*> m_rastro;
     const double escala = 20.0;
     const int diametro = 10;
 };

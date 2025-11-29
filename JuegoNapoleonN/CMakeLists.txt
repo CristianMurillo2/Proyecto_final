@@ -19,11 +19,17 @@ qt_add_executable(appJuegoNapoleonN
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
-    pantallanivel1.h pantallanivel1.cpp pantallanivel1.ui
+
     pantallanivel2.h pantallanivel2.cpp pantallanivel2.ui
     pantallanivel3.h pantallanivel3.cpp pantallanivel3.ui
     movimientoparticula.h movimientoparticula.cpp
     cannonball.h cannonball.cpp
+    recursos.qrc
+    balacanon.cpp balacanon.h isla.cpp isla.h personaje.cpp personaje.h personajenivel1.cpp personajenivel1.h
+    pantallanivel1.ui
+    pantallanivel1.cpp pantallanivel1.h
+    arma.cpp arma.h cajaArma.cpp cajaArma.h enemigo.cpp enemigo.h  pantallanivel3.cpp pantallanivel3.h personajenivel3.cpp personajenivel3.h
+
 )
 
 target_link_libraries(appJuegoNapoleonN PRIVATE

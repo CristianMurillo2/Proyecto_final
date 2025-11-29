@@ -6,26 +6,40 @@
 #include <QPainter>
 #include <QDebug>
 #include <QList>
+
+QPixmap* Isla::texturaIsla1 = nullptr;
+QPixmap* Isla::texturaIsla2 = nullptr;
+
 Isla::Isla(qreal x, qreal tamano, qreal velocidadBajada, QGraphicsItem *parent)
     : QObject(nullptr),
     QGraphicsPixmapItem(parent),
     velocidad(velocidadBajada)
 {
-    QString rutaHoja = ":/recursos/tiles_sheet.png";
-    QPixmap hojaCompleta(rutaHoja);
-
-        QPixmap texturaIsla;
-        int tipo = QRandomGenerator::global()->bounded(0, 2);
-
-        if (tipo == 0) {
-            texturaIsla = hojaCompleta.copy(0, 0, 190, 190);
+    if (texturaIsla1 == nullptr) {
+        QString rutaHoja = ":/recursos/tiles_sheet.png";
+        QPixmap hojaCompleta(rutaHoja);
+        if (!hojaCompleta.isNull()) {
+            texturaIsla1 = new QPixmap(hojaCompleta.copy(0, 0, 190, 190));
+            texturaIsla2 = new QPixmap(hojaCompleta.copy(325, 0, 250, 255));
         } else {
-            texturaIsla = hojaCompleta.copy(325, 0, 250, 255);
+            texturaIsla1 = new QPixmap(100, 100);
+            texturaIsla1->fill(Qt::green);
+            texturaIsla2 = new QPixmap(100, 100);
+            texturaIsla2->fill(Qt::darkGreen);
         }
-        if (texturaIsla.isNull()) {
-            texturaIsla = hojaCompleta.copy(0,0,100,100);
-        }
-        setPixmap(texturaIsla.scaled(tamano, tamano, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    }
+    QPixmap texturaUsar;
+    int tipo = QRandomGenerator::global()->bounded(0, 2);
+    if (tipo == 0 && !texturaIsla1->isNull()) {
+        texturaUsar = *texturaIsla1;
+    } else if (!texturaIsla2->isNull()) {
+        texturaUsar = *texturaIsla2;
+    } else {
+        texturaUsar = QPixmap(tamano, tamano);
+        texturaUsar.fill(Qt::gray);
+    }
+
+    setPixmap(texturaUsar.scaled(tamano, tamano, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     setPos(x, -tamano);
     setZValue(1);
     timerMovimiento = new QTimer(this);
@@ -38,7 +52,7 @@ void Isla::mover()
     setPos(x(), y() + velocidad);
     if (y() > 600) {
         if (scene()) scene()->removeItem(this);
-        delete this;
+        this->deleteLater();
         return;
     }
     QList<QGraphicsItem*> colisiones = collidingItems(Qt::IntersectsItemBoundingRect);

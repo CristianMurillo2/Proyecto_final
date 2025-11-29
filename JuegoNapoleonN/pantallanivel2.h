@@ -1,12 +1,10 @@
 #ifndef PANTALLANIVEL2_H
 #define PANTALLANIVEL2_H
 
+#include <QKeyEvent>
 #include <QDialog>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
-#include <QMessageBox>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
 #include "cannonball.h"
 #include <QPainter>
 #include <Qimage.h>
@@ -16,6 +14,11 @@
 #include <cmath>
 #include <QList>
 #include <QSoundEffect>
+#include <QGraphicsTextItem>
+#include <QFont>
+#include <QDebug>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 
 namespace Ui {
 class pantallaNivel2;
@@ -29,6 +32,8 @@ public:
     explicit pantallaNivel2(QWidget *parent = nullptr);
     ~pantallaNivel2();
 
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
 
 private slots:
     void on_pushButton_clicked();
@@ -40,9 +45,10 @@ private slots:
 
 private:
     void iniciarNivel();
+    QGraphicsTextItem *textoCronometro;
     Ui::pantallaNivel2 *ui;
     QGraphicsScene *m_scene;
-    CannonBall *m_bola;
+    QList<CannonBall*> m_balas;
     QGraphicsPixmapItem *cannon;
     QGraphicsPixmapItem *base;
     QGraphicsPixmapItem *banderaF;
@@ -56,6 +62,8 @@ private:
     QTimer *timerJuego;
     int tiempoRestante;
     QSoundEffect *sonidoDisparo;
+    QMediaPlayer *musicaFondo;
+    QAudioOutput *salidaAudio;
 };
 
 #endif // PANTALLANIVEL2_H

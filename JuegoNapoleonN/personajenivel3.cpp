@@ -11,7 +11,7 @@ PersonajeNivel3::PersonajeNivel3(QGraphicsItem *parent)
     : Personaje(parent), w(false), a(false), s(false), d(false),
     ultimaDirX(0), ultimaDirY(1), puedeDisparar(true)
 {
-    QPixmap hojaCompleta(":/recursos/napoleon.png");
+    static QPixmap hojaCompleta(":/recursos/napoleon.png");
 
     int x = 150;
     int y = 725;
@@ -142,7 +142,7 @@ void PersonajeNivel3::disparar()
 
     if (!scene()) return;
 
-    if (sonidoDisparo->isPlaying()) sonidoDisparo->stop();
+    if (sonidoDisparo->isPlaying()) {sonidoDisparo->stop();}
     sonidoDisparo->play();
 
     qreal cx = x() + boundingRect().width() / 2 - 5;

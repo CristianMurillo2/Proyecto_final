@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_fondoLabel->lower();
     m_fondoLabel->setMovie(m_gifAnimacion);
     m_gifAnimacion->start();
+    this->showFullScreen();
 }
 
 MainWindow::~MainWindow()
