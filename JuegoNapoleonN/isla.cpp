@@ -7,41 +7,44 @@
 #include <QDebug>
 #include <QList>
 
-QPixmap* Isla::texturaIsla1 = nullptr;
-QPixmap* Isla::texturaIsla2 = nullptr;
-
 Isla::Isla(qreal x, qreal tamano, qreal velocidadBajada, QGraphicsItem *parent)
     : QObject(nullptr),
     QGraphicsPixmapItem(parent),
     velocidad(velocidadBajada)
 {
-    if (texturaIsla1 == nullptr) {
+    static QPixmap textura1;
+    static QPixmap textura2;
+    static bool imagenesCargadas = false;
+
+    if (!imagenesCargadas) {
         QString rutaHoja = ":/recursos/tiles_sheet.png";
         QPixmap hojaCompleta(rutaHoja);
+
         if (!hojaCompleta.isNull()) {
-            texturaIsla1 = new QPixmap(hojaCompleta.copy(0, 0, 190, 190));
-            texturaIsla2 = new QPixmap(hojaCompleta.copy(325, 0, 250, 255));
+            textura1 = hojaCompleta.copy(0, 0, 190, 190);
+            textura2 = hojaCompleta.copy(325, 0, 250, 255);
         } else {
-            texturaIsla1 = new QPixmap(100, 100);
-            texturaIsla1->fill(Qt::green);
-            texturaIsla2 = new QPixmap(100, 100);
-            texturaIsla2->fill(Qt::darkGreen);
+            textura1 = QPixmap(100, 100);
+            textura1.fill(Qt::green);
+            textura2 = QPixmap(100, 100);
+            textura2.fill(Qt::darkGreen);
         }
+        imagenesCargadas = true;
     }
+
     QPixmap texturaUsar;
     int tipo = QRandomGenerator::global()->bounded(0, 2);
-    if (tipo == 0 && !texturaIsla1->isNull()) {
-        texturaUsar = *texturaIsla1;
-    } else if (!texturaIsla2->isNull()) {
-        texturaUsar = *texturaIsla2;
+
+    if (tipo == 0) {
+        texturaUsar = textura1;
     } else {
-        texturaUsar = QPixmap(tamano, tamano);
-        texturaUsar.fill(Qt::gray);
+        texturaUsar = textura2;
     }
 
     setPixmap(texturaUsar.scaled(tamano, tamano, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     setPos(x, -tamano);
     setZValue(1);
+
     timerMovimiento = new QTimer(this);
     connect(timerMovimiento, &QTimer::timeout, this, &Isla::mover);
     timerMovimiento->start(30);

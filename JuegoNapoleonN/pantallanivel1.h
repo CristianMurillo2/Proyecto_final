@@ -10,6 +10,8 @@
 #include <QList>
 #include <QKeyEvent>
 #include <QGraphicsSimpleTextItem>
+#include <QMediaPlayer>   // <--- AGREGAR
+#include <QAudioOutput>
 #include "balacanon.h"
 #include "PersonajeNivel1.h"
 #include "isla.h"
@@ -20,6 +22,7 @@ class PantallaNivel1 : public QDialog
 
 public:
     explicit PantallaNivel1(QWidget *parent = nullptr);
+    ~PantallaNivel1();
 
 public slots:
     void actualizarVida(int vida);
@@ -32,6 +35,7 @@ public slots:
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
     void crearEscenario();
@@ -51,6 +55,8 @@ private:
     QGraphicsTextItem *textoGameOver;
     QGraphicsTextItem *textoCronometro;
     QList<TipoDisparo> bolsaDisparos;
+    QMediaPlayer *musicaFondo;
+    QAudioOutput *salidaAudio;
 };
 
 #endif

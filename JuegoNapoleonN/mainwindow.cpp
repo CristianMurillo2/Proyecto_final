@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QMovie>
 #include "pantallanivel1.h"
 #include "pantallanivel2.h"
 #include "pantallanivel3.h"
@@ -37,13 +36,15 @@ void MainWindow::on_btnNivel1_clicked()
 {
     if (m_gifAnimacion) m_gifAnimacion->stop();
     this->hide();
-    PantallaNivel1 *nivel1 = new PantallaNivel1(this);
-    connect(nivel1, &QDialog::finished, this, [this]() {
+    pantalla1 = new PantallaNivel1(this);
+    pantalla1->setAttribute(Qt::WA_DeleteOnClose);
+    connect(pantalla1, &QDialog::finished, this, [this]() {
         this->show();
         if (m_gifAnimacion) m_gifAnimacion->start();
         centrarVentana();
+        pantalla1 = nullptr;
     });
-    nivel1->show();
+    pantalla1->showFullScreen();
 }
 
 void MainWindow::on_btnNivel2_clicked()
@@ -52,10 +53,11 @@ void MainWindow::on_btnNivel2_clicked()
     this->hide();
 
     pantalla2 = new pantallaNivel2(this);
-
+    pantalla2->setAttribute(Qt::WA_DeleteOnClose);
     connect(pantalla2, &QDialog::finished, this, [this](){
         this->show();
         if(m_gifAnimacion) m_gifAnimacion->start();
+        pantalla2 = nullptr;
     });
 
     pantalla2->show();
@@ -67,10 +69,11 @@ void MainWindow::on_btnNivel3_clicked()
     this->hide();
 
     pantalla3 = new PantallaNivel3(this);
-
+    pantalla3->setAttribute(Qt::WA_DeleteOnClose);
     connect(pantalla3, &QDialog::finished, this, [this](){
         this->show();
         if(m_gifAnimacion) m_gifAnimacion->start();
+        pantalla3 = nullptr;
     });
 
     pantalla3->show();

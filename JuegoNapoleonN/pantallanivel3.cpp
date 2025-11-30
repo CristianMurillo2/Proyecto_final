@@ -4,18 +4,23 @@
 #include <QBrush>
 #include <QRandomGenerator>
 #include <QDialog>
+#include <QResizeEvent>
 
 PantallaNivel3::PantallaNivel3(QWidget *parent) : QDialog(parent)
 {
     setAttribute(Qt::WA_DeleteOnClose);
+
+    this->setWindowState(Qt::WindowFullScreen);
     scene = new QGraphicsScene(this);
+    scene->setSceneRect(0, 0, 1280, 720);
     view = new QGraphicsView(scene, this);
 
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view->setFixedSize(1280, 720);
 
     QHBoxLayout *layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
     layout->addWidget(view);
     setLayout(layout);
 
@@ -32,7 +37,7 @@ PantallaNivel3::PantallaNivel3(QWidget *parent) : QDialog(parent)
     timerItems->start(10000);
     musicaFondo = new QSoundEffect(this);
     musicaFondo->setSource(QUrl("qrc:/recursos/MA_Pereveslo_We_Are_All_Leaders.wav"));
-    musicaFondo->setVolume(0.0f);
+    musicaFondo->setVolume(0.1f);
     musicaFondo->setLoopCount(QSoundEffect::Infinite);
     musicaFondo->play();
     connect(jugador, &PersonajeNivel3::jugadorMuerto, this, &PantallaNivel3::detenerJuego);
@@ -62,11 +67,13 @@ PantallaNivel3::PantallaNivel3(QWidget *parent) : QDialog(parent)
 
 PantallaNivel3::~PantallaNivel3()
 {
-    if(gameTimer) gameTimer->stop();
-    if(timerItems) timerItems->stop();
-    if(timerSpawns) timerSpawns->stop();
-    if(musicaFondo) musicaFondo->stop();
+    if (gameTimer->isActive()) gameTimer->stop();
+    if (timerItems->isActive()) timerItems->stop();
+    if (timerSpawns->isActive()) timerSpawns->stop();
+    if (musicaFondo) {musicaFondo->stop();}
     if(jugador) jugador->clearFocus();
+    if(scene) scene->clear();
+    qDebug() << "Nivel 3 destruido correctamente.";
 }
 
 void PantallaNivel3::crearEscenario()
@@ -331,7 +338,7 @@ void PantallaNivel3::detenerJuego()
     qreal ty = (720 - textoGO->boundingRect().height()) / 2;
     textoGO->setPos(tx, ty);
     scene->addItem(textoGO);
-    QTimer::singleShot(3000, this, &PantallaNivel3::close);
+    QTimer::singleShot(3000, this, [this](){this->close();});
 }
 
 void PantallaNivel3::actualizarContadorVida(int vida)
@@ -340,4 +347,12 @@ void PantallaNivel3::actualizarContadorVida(int vida)
         if (vida == 1) {
         textoVida->setDefaultTextColor(Qt::darkRed);
     }
+}
+
+void PantallaNivel3::resizeEvent(QResizeEvent *event)
+{
+    if (view && scene) {
+        view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+    }
+    QDialog::resizeEvent(event);
 }

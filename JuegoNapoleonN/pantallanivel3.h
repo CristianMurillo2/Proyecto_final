@@ -21,6 +21,9 @@ public:
     explicit PantallaNivel3(QWidget *parent = nullptr);
     ~PantallaNivel3();
 
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+
 public slots:
     void generarCajaArma();
     void generarEnemigo();

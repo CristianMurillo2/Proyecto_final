@@ -62,7 +62,7 @@ void PersonajeNivel3::keyPressEvent(QKeyEvent *event)
     case Qt::Key_S: s = true; break;
     case Qt::Key_A: a = true; break;
     case Qt::Key_D: d = true; break;
-    case Qt::Key_C:
+    case Qt::Key_Space:
         if (puedeDisparar) {
             disparar();
         }

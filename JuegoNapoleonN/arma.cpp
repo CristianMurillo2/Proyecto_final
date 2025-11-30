@@ -9,22 +9,25 @@
 Arma::Arma(qreal x, qreal y, qreal dirX, qreal dirY, int rango, bool perforante, bool esDelEnemigo, QGraphicsItem *parent)
     : QObject(nullptr), QGraphicsPixmapItem(parent), esPerforante(perforante), esEnemigo(esDelEnemigo)
 {
-    QString rutaImagen = ":/recursos/cannonBall.png";
+    static QPixmap texturaFinal;
+    static bool inicializado = false;
 
-    QPixmap skin(rutaImagen);
+    if (!inicializado) {
+        QPixmap carga(":/recursos/cannonBall.png");
 
-    int tamano = 15;
-
-    if (skin.isNull()) {
-        skin = QPixmap(tamano, tamano);
-        skin.fill(esEnemigo ? Qt::magenta : Qt::yellow);
+        if (carga.isNull()) {
+            texturaFinal = QPixmap(15, 15);
+            texturaFinal.fill(Qt::yellow);
+        } else {
+            texturaFinal = carga.scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        }
+        inicializado = true;
     }
-    setPixmap(skin.scaled(tamano, tamano, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    setTransformOriginPoint(boundingRect().center());
-
+    setPixmap(texturaFinal);
     setPos(x, y);
     qreal anguloRad = qAtan2(dirY, dirX);
     setRotation(qRadiansToDegrees(anguloRad));
+
     qreal velocidad = esEnemigo ? 6.0 : (esPerforante ? 20.0 : 10.0);
     qreal longitud = qSqrt(dirX*dirX + dirY*dirY);
 

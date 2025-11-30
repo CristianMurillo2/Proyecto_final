@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QGraphicsPixmapItem>
 #include <QTimer>
+#include <QGraphicsRectItem>
+
 enum TipoDisparo {
     LINEAL,
     PARABOLICO,
@@ -31,10 +33,11 @@ private:
     qreal alto;
     QTimer *timerMovimiento;
     int dano;
-    static QPixmap* texturaBala;
     TipoDisparo tipoMovimiento;
     double tiempoVida;
     qreal baseVX, baseVY;
+    qreal inicioX;
+    qreal inicioY;
 };
 
 #endif // BALACANON_H

@@ -11,14 +11,25 @@
 PantallaNivel1::PantallaNivel1(QWidget *parent) : QDialog(parent)
 {
     setAttribute(Qt::WA_DeleteOnClose);
+
+    this->setWindowState(Qt::WindowFullScreen);
     scene = new QGraphicsScene(this);
     view = new QGraphicsView(scene, this);
 
+    musicaFondo = new QMediaPlayer(this);
+    salidaAudio = new QAudioOutput(this);
+    musicaFondo->setAudioOutput(salidaAudio);
+    musicaFondo->setSource(QUrl("qrc:/recursos/Piratas del Caribe.mp3"));
+    salidaAudio->setVolume(0.2);
+    musicaFondo->setLoops(QMediaPlayer::Infinite);
+    musicaFondo->play();
+
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view->setFixedSize(800, 600);
-
     scene->setSceneRect(0, 0, 800, 600);
+    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setFrameStyle(QFrame::NoFrame);
 
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -42,6 +53,16 @@ PantallaNivel1::PantallaNivel1(QWidget *parent) : QDialog(parent)
     connect(timerCronometro, &QTimer::timeout, this, &PantallaNivel1::actualizarCronometro);
     timerCronometro->start(1000);
 }
+PantallaNivel1::~PantallaNivel1()
+{
+    if (musicaFondo) {musicaFondo->stop();}
+    if (gameTimer && gameTimer->isActive()) gameTimer->stop();
+    if (spawnTimer && spawnTimer->isActive()) spawnTimer->stop();
+    if (islaTimer && islaTimer->isActive()) islaTimer->stop();
+    if (timerCronometro && timerCronometro->isActive()) timerCronometro->stop();
+    if (scene) {scene->clear(); }
+}
+
 TipoDisparo PantallaNivel1::obtenerSiguienteDisparo()
 {
     if (bolsaDisparos.isEmpty()) {
@@ -212,6 +233,7 @@ void PantallaNivel1::mostrarGameOver(bool ganado)
     islaTimer->stop();
     if (timerCronometro) timerCronometro->stop();
     if (jugador) jugador->clearFocus();
+    if(musicaFondo) {musicaFondo->stop();}
 
     QRectF bounds = scene->sceneRect();
     QGraphicsRectItem *fondoOscuro = new QGraphicsRectItem(bounds);
@@ -237,5 +259,13 @@ void PantallaNivel1::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Escape) {
         this->close();
         return;
+    }
+}
+void PantallaNivel1::resizeEvent(QResizeEvent *event)
+{
+    QDialog::resizeEvent(event);
+    if (view && scene) {
+        view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+        view->fitInView(scene->sceneRect(), Qt::IgnoreAspectRatio);
     }
 }
