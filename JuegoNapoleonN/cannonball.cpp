@@ -37,15 +37,22 @@ CannonBall::~CannonBall()
 
 void CannonBall::actualizarPosicion()
 {
-    QPointF currentPos = pos();
+    const int MAX_TRAIL_DOTS = 60;
 
+    QPointF currentPos = pos();
     QGraphicsEllipseItem *trailDot = new QGraphicsEllipseItem(currentPos.x(), currentPos.y(), 2, 2);
     trailDot->setBrush(QBrush(Qt::gray));
     trailDot->setPen(Qt::NoPen);
-
     if (m_scene) {
         m_scene->addItem(trailDot);
         m_rastro.append(trailDot);
+    }
+    while (m_rastro.size() > MAX_TRAIL_DOTS) {
+        QGraphicsItem *old = m_rastro.takeFirst();
+        if (m_scene && m_scene->items().contains(old)) {
+            m_scene->removeItem(old);
+        }
+        delete old;
     }
 
     m_fisica->calcularVelocidad();

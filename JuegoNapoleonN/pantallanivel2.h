@@ -2,7 +2,7 @@
 #define PANTALLANIVEL2_H
 
 #include <QKeyEvent>
-#include <QDialog>
+#include <QWidget>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
 #include "cannonball.h"
@@ -24,7 +24,7 @@ namespace Ui {
 class pantallaNivel2;
 }
 
-class pantallaNivel2 : public QDialog
+class pantallaNivel2 : public QWidget
 {
     Q_OBJECT
 
@@ -32,16 +32,17 @@ public:
     explicit pantallaNivel2(QWidget *parent = nullptr);
     ~pantallaNivel2();
 
+signals:
+    void regresarAlMenu();
+
 protected:
     void keyPressEvent(QKeyEvent *event) override;
 
 private slots:
-    void on_pushButton_clicked();
     void on_btnDisparar_clicked();
     void on_verticalSlider_valueChanged(int value);
     void verificarColisiones();
     void actualizarCronometro();
-    void reiniciarJuego();
 
 private:
     void iniciarNivel();

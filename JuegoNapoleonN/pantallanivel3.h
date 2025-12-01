@@ -1,7 +1,7 @@
 #ifndef PANTALLANIVEL3_H
 #define PANTALLANIVEL3_H
 
-#include <QDialog>
+#include <QWidget>
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QTimer>
@@ -9,11 +9,17 @@
 #include <QGraphicsTextItem>
 #include <QGraphicsPixmapItem>
 #include <QSoundEffect>
+#include <QKeyEvent>
+#include <QGraphicsRectItem>
+#include <QHBoxLayout>
+#include <QBrush>
+#include <QRandomGenerator>
+#include <QResizeEvent>
 #include "personajenivel3.h"
 #include "cajaArma.h"
 #include "enemigo.h"
 
-class PantallaNivel3 : public QDialog
+class PantallaNivel3 : public QWidget
 {
     Q_OBJECT
 
@@ -21,8 +27,14 @@ public:
     explicit PantallaNivel3(QWidget *parent = nullptr);
     ~PantallaNivel3();
 
+signals:
+    void regresarAlMenu();
+
 protected:
     void resizeEvent(QResizeEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
+    void showEvent(QShowEvent *event) override;
 
 public slots:
     void generarCajaArma();

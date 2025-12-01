@@ -1,14 +1,17 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "pantallanivel1.h"
-#include "pantallanivel2.h"
-#include "pantallanivel3.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    m_stack = new QStackedWidget(this);
+    QWidget *menuWidget = ui->centralwidget;
+    m_stack->addWidget(menuWidget);
+    setCentralWidget(m_stack);
+
     m_gifAnimacion = new QMovie(":/recursos/PortadaNapoleon.gif");
     m_fondoLabel = new QLabel(this);
     m_fondoLabel->setScaledContents(true);
@@ -35,48 +38,33 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 void MainWindow::on_btnNivel1_clicked()
 {
     if (m_gifAnimacion) m_gifAnimacion->stop();
-    this->hide();
     pantalla1 = new PantallaNivel1(this);
-    pantalla1->setAttribute(Qt::WA_DeleteOnClose);
-    connect(pantalla1, &QDialog::finished, this, [this]() {
-        this->show();
-        if (m_gifAnimacion) m_gifAnimacion->start();
-        centrarVentana();
-        pantalla1 = nullptr;
-    });
-    pantalla1->showFullScreen();
+    connect(pantalla1, &PantallaNivel1::regresarAlMenu, this, &MainWindow::volverAlMenuPrincipal);
+
+
+    m_stack->addWidget(pantalla1);
+    m_stack->setCurrentWidget(pantalla1);
+    pantalla1->setFocus();
 }
 
 void MainWindow::on_btnNivel2_clicked()
 {
     if (m_gifAnimacion) m_gifAnimacion->stop();
-    this->hide();
-
     pantalla2 = new pantallaNivel2(this);
-    pantalla2->setAttribute(Qt::WA_DeleteOnClose);
-    connect(pantalla2, &QDialog::finished, this, [this](){
-        this->show();
-        if(m_gifAnimacion) m_gifAnimacion->start();
-        pantalla2 = nullptr;
-    });
-
-    pantalla2->show();
+    connect(pantalla2, &pantallaNivel2::regresarAlMenu, this, &MainWindow::volverAlMenuPrincipal);
+    m_stack->addWidget(pantalla2);
+    m_stack->setCurrentWidget(pantalla2);
+    pantalla2->setFocus();
 }
 
 void MainWindow::on_btnNivel3_clicked()
 {
     if (m_gifAnimacion) m_gifAnimacion->stop();
-    this->hide();
-
     pantalla3 = new PantallaNivel3(this);
-    pantalla3->setAttribute(Qt::WA_DeleteOnClose);
-    connect(pantalla3, &QDialog::finished, this, [this](){
-        this->show();
-        if(m_gifAnimacion) m_gifAnimacion->start();
-        pantalla3 = nullptr;
-    });
-
-    pantalla3->show();
+    connect(pantalla3, &PantallaNivel3::regresarAlMenu, this, &MainWindow::volverAlMenuPrincipal);
+    m_stack->addWidget(pantalla3);
+    m_stack->setCurrentWidget(pantalla3);
+    pantalla3->setFocus();
 }
 
 void MainWindow::centrarVentana()
@@ -86,4 +74,18 @@ void MainWindow::centrarVentana()
     int x = (screenGeometry.width() - width()) / 2;
     int y = (screenGeometry.height() - height()) / 2;
     move(x, y);
+}
+
+void MainWindow::volverAlMenuPrincipal()
+{
+    QWidget *widgetActual = m_stack->currentWidget();
+    if (widgetActual != m_stack->widget(0)) {
+        m_stack->removeWidget(widgetActual);
+        widgetActual->deleteLater();
+    }
+    m_stack->setCurrentIndex(0);
+    if (m_gifAnimacion) m_gifAnimacion->start();
+    pantalla1 = nullptr;
+    pantalla2 = nullptr;
+    pantalla3 = nullptr;
 }

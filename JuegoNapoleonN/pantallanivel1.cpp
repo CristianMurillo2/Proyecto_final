@@ -8,13 +8,14 @@
 #include <algorithm>
 #include <QKeyEvent>
 
-PantallaNivel1::PantallaNivel1(QWidget *parent) : QDialog(parent)
+PantallaNivel1::PantallaNivel1(QWidget *parent) : QWidget(parent)
 {
-    setAttribute(Qt::WA_DeleteOnClose);
+    this->setFocusPolicy(Qt::StrongFocus);
 
-    this->setWindowState(Qt::WindowFullScreen);
+    //this->setWindowState(Qt::WindowFullScreen);
     scene = new QGraphicsScene(this);
     view = new QGraphicsView(scene, this);
+    view->setFocusPolicy(Qt::NoFocus);
 
     musicaFondo = new QMediaPlayer(this);
     salidaAudio = new QAudioOutput(this);
@@ -26,7 +27,7 @@ PantallaNivel1::PantallaNivel1(QWidget *parent) : QDialog(parent)
 
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    scene->setSceneRect(0, 0, 800, 600);
+    scene->setSceneRect(0, 0, 1920, 1080);
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setFrameStyle(QFrame::NoFrame);
@@ -91,8 +92,6 @@ void PantallaNivel1::crearEscenario()
     connect(jugador, &Personaje::personajeMuerto, this, &PantallaNivel1::manejarMuerte);
     scene->addItem(jugador);
     jugador->setFocus();
-
-
 }
 
 void PantallaNivel1::crearHUD()
@@ -251,21 +250,48 @@ void PantallaNivel1::mostrarGameOver(bool ganado)
     QPointF centro = bounds.center();
     textoFinal->setPos(centro.x() - (rectTexto.width() / 2), centro.y() - (rectTexto.height() / 2));
     scene->addItem(textoFinal);
-    QTimer::singleShot(3000, this, &PantallaNivel1::close);
+    QTimer::singleShot(3000, this, [this](){
+        emit regresarAlMenu();
+    });
 }
 
 void PantallaNivel1::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Escape) {
-        this->close();
+        gameTimer->stop();
+        spawnTimer->stop();
+        islaTimer->stop();
+        if (timerCronometro) timerCronometro->stop();
+        if (musicaFondo) musicaFondo->stop();
+        emit regresarAlMenu();
         return;
     }
+    if (jugador) {
+        jugador->keyPressEvent(event);
+    }
 }
+
+void PantallaNivel1::keyReleaseEvent(QKeyEvent *event)
+{
+    if (jugador) {
+        jugador->keyReleaseEvent(event);
+    }
+}
+
 void PantallaNivel1::resizeEvent(QResizeEvent *event)
 {
-    QDialog::resizeEvent(event);
+    QWidget::resizeEvent(event);
+
     if (view && scene) {
-        view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
         view->fitInView(scene->sceneRect(), Qt::IgnoreAspectRatio);
     }
 }
+void PantallaNivel1::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    if (view && scene) {
+        view->fitInView(scene->sceneRect(), Qt::IgnoreAspectRatio);
+    }
+    this->setFocus();
+}
+

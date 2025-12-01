@@ -1,25 +1,31 @@
 #include "pantallanivel2.h"
 #include "ui_pantallanivel2.h"
 
-
 pantallaNivel2::pantallaNivel2(QWidget *parent)
-    : QDialog(parent)
+    : QWidget(parent)
     , ui(new Ui::pantallaNivel2)
     , m_scene(nullptr)
     , cannon(nullptr)
     , base(nullptr)
 {
     ui->setupUi(this);
-    setAttribute(Qt::WA_DeleteOnClose);
-
-    this->showFullScreen();
+    this->setFocusPolicy(Qt::StrongFocus);
 
     m_anguloGrados = ui->verticalSlider->value();
-    ui->lblAngulo->setText(QString("%1°").arg(m_anguloGrados, 0, 'f', 0));
+    ui->lblAngulo->setText(QString("%01°").arg(m_anguloGrados, 0, 'f', 0));
 
     m_scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(m_scene);
+    m_scene->setSceneRect(0, 0, 1145, 746);
+    ui->graphicsView->setAlignment(Qt::AlignLeft | Qt::AlignBottom);
+    if (layout()) {
+        layout()->setContentsMargins(0, 0, 0, 0);
+    }
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
+    ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    ui->graphicsView->setFocusPolicy(Qt::NoFocus);
 
     timerColisiones = new QTimer(this);
     connect(timerColisiones, &QTimer::timeout, this, &pantallaNivel2::verificarColisiones);
@@ -34,6 +40,18 @@ pantallaNivel2::pantallaNivel2(QWidget *parent)
     iniciarNivel();
 }
 
+pantallaNivel2::~pantallaNivel2()
+{
+    if (musicaFondo) musicaFondo->stop();
+    if (timerColisiones) timerColisiones->stop();
+    if (timerJuego->isActive()) timerJuego->stop();
+    qDeleteAll(m_balas);
+    m_balas.clear();
+
+    if (m_scene) m_scene->clear();
+    delete ui;
+}
+
 void pantallaNivel2::iniciarNivel(){
 
     m_scene->clear();
@@ -41,7 +59,7 @@ void pantallaNivel2::iniciarNivel(){
     cannon = nullptr;
     base = nullptr;
     obst.clear();
-    tiempoRestante = 45;
+    tiempoRestante = 40;
 
     QImage imagen(":/recursos/fondo nivel-2.jpeg");
     QBrush fondo(imagen);
@@ -124,24 +142,12 @@ void pantallaNivel2::iniciarNivel(){
     timerJuego->start(1000);
 
 }
-pantallaNivel2::~pantallaNivel2()
-{
-    if (timerColisiones) timerColisiones->stop();
-    if (timerJuego->isActive()) timerJuego->stop();
-    delete ui;
-}
-
-void pantallaNivel2::on_pushButton_clicked()
-{
-    this->close();
-}
 
 void pantallaNivel2::on_btnDisparar_clicked()
 {
     if (m_balas.size() >= 3) {
         return;
     }
-
     if (sonidoDisparo) {
         sonidoDisparo->play();
     }
@@ -174,13 +180,14 @@ void pantallaNivel2::on_verticalSlider_valueChanged(int value)
 void pantallaNivel2::verificarColisiones()
 {
     double limiteSuelo = 0;
-    double limiteDerecha = m_scene->sceneRect().width() + 100;
+    double limiteDerecha = m_scene->sceneRect().width() + 700;
     for (int i = m_balas.size() - 1; i >= 0; --i) {
         CannonBall *b = m_balas[i];
         bool balaEliminada = false;
         if (b->y() > limiteSuelo || b->x() > limiteDerecha || b->x() < -50) {
             m_scene->removeItem(b);
             delete b;
+            b = nullptr;
             m_balas.removeAt(i);
             balaEliminada = true;
         }
@@ -197,6 +204,7 @@ void pantallaNivel2::verificarColisiones()
                 m_scene->addItem(roto);
                 m_scene->removeItem(b);
                 delete b;
+                b = nullptr;
                 m_balas.removeAt(i);
                 balaEliminada = true;
                 break;
@@ -206,11 +214,6 @@ void pantallaNivel2::verificarColisiones()
     if (obst.isEmpty()) {
         finalizarJuego(true);
     }
-}
-
-void pantallaNivel2::reiniciarJuego()
-{
-    iniciarNivel();
 }
 
 void pantallaNivel2::actualizarCronometro()
@@ -237,6 +240,13 @@ void pantallaNivel2::actualizarCronometro()
 
 void pantallaNivel2::keyPressEvent(QKeyEvent *event)
 {
+    if (event->key() == Qt::Key_Escape) {
+        if (musicaFondo) musicaFondo->stop();
+        if (timerJuego) timerJuego->stop();
+        if (timerColisiones) timerColisiones->stop();
+        emit regresarAlMenu();
+        return;
+    }
     if (event->key() == Qt::Key_W) {
         int valorActual = ui->verticalSlider->value();
         ui->verticalSlider->setValue(valorActual + 1);
@@ -249,7 +259,7 @@ void pantallaNivel2::keyPressEvent(QKeyEvent *event)
         on_btnDisparar_clicked();
     }
     else {
-        QDialog::keyPressEvent(event);
+        QWidget::keyPressEvent(event);
     }
 }
 
@@ -258,22 +268,24 @@ void pantallaNivel2::finalizarJuego(bool ganado)
     if (musicaFondo) {musicaFondo->stop();}
     if (timerJuego->isActive()) timerJuego->stop();
     if (timerColisiones->isActive()) timerColisiones->stop();
-    QRectF bounds = m_scene->sceneRect();
-    QGraphicsRectItem *fondoOscuro = new QGraphicsRectItem(bounds);
+    QGraphicsRectItem *fondoOscuro = new QGraphicsRectItem(-2000, -2000, 5000, 5000);
     fondoOscuro->setBrush(QColor(0, 0, 0, 150));
     fondoOscuro->setZValue(99);
     m_scene->addItem(fondoOscuro);
     QString mensaje = ganado ? "¡GANASTE!" : "GAME OVER";
     QColor colorTexto = ganado ? Qt::green : Qt::red;
-
     QGraphicsSimpleTextItem *textoFinal = new QGraphicsSimpleTextItem(mensaje);
     QFont fuente("Arial", 50, QFont::Bold);
     textoFinal->setFont(fuente);
     textoFinal->setBrush(QBrush(colorTexto));
     textoFinal->setZValue(100);
-    QRectF rectTexto = textoFinal->boundingRect();
-    QPointF centro = bounds.center();
-    textoFinal->setPos(centro.x() - (rectTexto.width() / 2), centro.y() - (rectTexto.height() / 2));
     m_scene->addItem(textoFinal);
-    QTimer::singleShot(3000, this, &pantallaNivel2::close);
+    QRect viewportRect = ui->graphicsView->viewport()->rect();
+    QPoint centroVentana = viewportRect.center();
+    QPointF centroEscena = ui->graphicsView->mapToScene(centroVentana);
+    QRectF rectTexto = textoFinal->boundingRect();
+    textoFinal->setPos(centroEscena.x() - (rectTexto.width() / 2), centroEscena.y() - (rectTexto.height() / 2));
+    QTimer::singleShot(3000, this, [this](){
+        emit regresarAlMenu();
+    });
 }

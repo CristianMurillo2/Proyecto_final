@@ -10,14 +10,11 @@ class PersonajeNivel1 : public Personaje
 
 public:
     explicit PersonajeNivel1(QGraphicsItem *parent = nullptr);
-
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
 
 public slots:
     void actualizarFisica();
-
-protected:
-    void keyPressEvent(QKeyEvent *event) override;
-    void keyReleaseEvent(QKeyEvent *event) override;
 
 private:
     qreal velX;

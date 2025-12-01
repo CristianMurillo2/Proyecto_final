@@ -1,22 +1,18 @@
 #include "pantallanivel3.h"
-#include <QGraphicsRectItem>
-#include <QHBoxLayout>
-#include <QBrush>
-#include <QRandomGenerator>
-#include <QDialog>
-#include <QResizeEvent>
 
-PantallaNivel3::PantallaNivel3(QWidget *parent) : QDialog(parent)
+
+PantallaNivel3::PantallaNivel3(QWidget *parent) : QWidget(parent)
 {
-    setAttribute(Qt::WA_DeleteOnClose);
-
-    this->setWindowState(Qt::WindowFullScreen);
+    this->setFocusPolicy(Qt::StrongFocus);
     scene = new QGraphicsScene(this);
     scene->setSceneRect(0, 0, 1280, 720);
     view = new QGraphicsView(scene, this);
 
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setFrameStyle(QFrame::NoFrame);
+    view->setFocusPolicy(Qt::NoFocus);
+    view->setAlignment(Qt::AlignCenter);
 
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -35,11 +31,13 @@ PantallaNivel3::PantallaNivel3(QWidget *parent) : QDialog(parent)
     timerItems = new QTimer(this);
     connect(timerItems, &QTimer::timeout, this, &PantallaNivel3::generarCajaArma);
     timerItems->start(10000);
+
     musicaFondo = new QSoundEffect(this);
     musicaFondo->setSource(QUrl("qrc:/recursos/MA_Pereveslo_We_Are_All_Leaders.wav"));
     musicaFondo->setVolume(0.1f);
     musicaFondo->setLoopCount(QSoundEffect::Infinite);
     musicaFondo->play();
+
     connect(jugador, &PersonajeNivel3::jugadorMuerto, this, &PantallaNivel3::detenerJuego);
     oleadaActual = 0;
     enemigosVivos = 0;
@@ -74,6 +72,26 @@ PantallaNivel3::~PantallaNivel3()
     if(jugador) jugador->clearFocus();
     if(scene) scene->clear();
     qDebug() << "Nivel 3 destruido correctamente.";
+}
+
+void PantallaNivel3::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape) {
+        detenerJuego();
+        emit regresarAlMenu();
+        return;
+    }
+
+    if (jugador) {
+        jugador->keyPressEvent(event);
+    }
+}
+
+void PantallaNivel3::keyReleaseEvent(QKeyEvent *event)
+{
+    if (jugador) {
+        jugador->keyReleaseEvent(event);
+    }
 }
 
 void PantallaNivel3::crearEscenario()
@@ -319,6 +337,9 @@ void PantallaNivel3::mostrarVictoria()
     textoWin->setPos(tx, ty);
 
     scene->addItem(textoWin);
+    QTimer::singleShot(4000, this, [this](){
+        emit regresarAlMenu();
+    });
 }
 
 void PantallaNivel3::detenerJuego()
@@ -327,7 +348,7 @@ void PantallaNivel3::detenerJuego()
     timerItems->stop();
     timerSpawns->stop();
     if(musicaFondo) musicaFondo->stop();
-    jugador->clearFocus();
+    if(jugador) jugador->clearFocus();
 
     QGraphicsTextItem *textoGO = new QGraphicsTextItem("GAME OVER");
     QFont fuente("Arial", 50, QFont::Bold);
@@ -338,7 +359,10 @@ void PantallaNivel3::detenerJuego()
     qreal ty = (720 - textoGO->boundingRect().height()) / 2;
     textoGO->setPos(tx, ty);
     scene->addItem(textoGO);
-    QTimer::singleShot(3000, this, [this](){this->close();});
+    QTimer::singleShot(3000, this, [this](){
+        emit regresarAlMenu();
+    });
+
 }
 
 void PantallaNivel3::actualizarContadorVida(int vida)
@@ -349,10 +373,14 @@ void PantallaNivel3::actualizarContadorVida(int vida)
     }
 }
 
-void PantallaNivel3::resizeEvent(QResizeEvent *event)
-{
-    if (view && scene) {
-        view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
-    }
-    QDialog::resizeEvent(event);
+void PantallaNivel3::resizeEvent(QResizeEvent *event) {
+    QWidget::resizeEvent(event);
+    if(view && scene) view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }
+
+void PantallaNivel3::showEvent(QShowEvent *event) {
+    QWidget::showEvent(event);
+    if(view && scene) view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+    this->setFocus();
+}
+

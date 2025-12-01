@@ -15,6 +15,8 @@ public:
     explicit PersonajeNivel3(QGraphicsItem *parent = nullptr);
     void cambiarArma(TipoArma nuevoTipo, int duracionMs);
     void recibirDano();
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
 
 signals:
     void jugadorMuerto();
@@ -22,11 +24,7 @@ signals:
 
 public slots:
     void actualizarMovimiento();
-    void restaurarArma();
-
-protected:
-    void keyPressEvent(QKeyEvent *event) override;
-    void keyReleaseEvent(QKeyEvent *event) override;
+    void restaurarArma();  
 
 private:
     void disparar();

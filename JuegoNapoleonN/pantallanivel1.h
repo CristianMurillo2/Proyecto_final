@@ -1,7 +1,7 @@
 #ifndef PANTALLANIVEL1_H
 #define PANTALLANIVEL1_H
 
-#include <QDialog>
+#include <QWidget>
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QTimer>
@@ -10,19 +10,22 @@
 #include <QList>
 #include <QKeyEvent>
 #include <QGraphicsSimpleTextItem>
-#include <QMediaPlayer>   // <--- AGREGAR
+#include <QMediaPlayer>
 #include <QAudioOutput>
 #include "balacanon.h"
 #include "PersonajeNivel1.h"
 #include "isla.h"
 
-class PantallaNivel1 : public QDialog
+class PantallaNivel1 : public QWidget
 {
     Q_OBJECT
 
 public:
     explicit PantallaNivel1(QWidget *parent = nullptr);
     ~PantallaNivel1();
+
+signals:
+    void regresarAlMenu();
 
 public slots:
     void actualizarVida(int vida);
@@ -35,7 +38,9 @@ public slots:
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
+    void showEvent(QShowEvent *event) override;
 
 private:
     void crearEscenario();
