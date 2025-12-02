@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>pantallaNivel2</class>
- <widget class="QDialog" name="pantallaNivel2">
+ <widget class="QWidget" name="pantallaNivel2">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -14,62 +14,65 @@
    <string>Dialog</string>
   </property>
   <property name="styleSheet">
-   <string notr="true"/>
+   <string notr="true">/* --- DISEÑO DEL SLIDER (CAÑÓN) --- */
+
+/* 1. El carril (Groove) por donde corre el slider */
+QSlider::groove:vertical#verticalSlider {
+    background: #2c3e50;         /* Gris azulado oscuro (metal) */
+    width: 14px;                 /* Ancho del carril */
+    border: 1px solid #1a252f;   /* Borde oscuro */
+    border-radius: 7px;          /* Bordes redondeados */
+    margin: 0px 10px;            /* Márgenes laterales */
+}
+
+/* 2. El mango (Handle) que arrastras */
+QSlider::handle:vertical#verticalSlider {
+    background: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, 
+                stop:0.6 #D4AF37, stop:1 #8B6914); /* Degradado Dorado (Latón) */
+    border: 2px solid #5c4008;   /* Borde marrón oscuro */
+    height: 24px;                /* Altura del mango */
+    width: 24px;                 /* Ancho del mango */
+    margin: 0 -6px;              /* Truco para centrar el mango sobre el carril */
+    border-radius: 12px;         /* Círculo perfecto */
+}
+
+/* 3. Efecto al pasar el mouse por el mango */
+QSlider::handle:vertical:hover#verticalSlider {
+    background: #FFD700;         /* Dorado más brillante */
+}
+
+/* 4. La parte &quot;llena&quot; del slider (abajo del mango) */
+QSlider::sub-page:vertical#verticalSlider {
+    background: #555;            /* Gris vacío (parte superior) */
+    border-radius: 7px;
+}
+
+/* 5. La parte &quot;vacía&quot; (arriba del mango - en vertical Qt lo invierte a veces) */
+/* Usamos add-page para la parte llena si la lógica es invertida, 
+   pero visualmente esto hace que la barra se vea &quot;cargada&quot; */
+QSlider::add-page:vertical#verticalSlider {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #e74c3c, stop:1 #c0392b); /* Rojo intenso (Potencia/Angulo) */
+    border-radius: 7px;
+    margin: 0px 10px;
+}
+
+
+/* --- DISEÑO DEL LABEL (ÁNGULO) --- */
+
+QLabel#lblAngulo {
+    background-color: rgba(0, 0, 0, 180); /* Negro semitransparente */
+    border: 3px solid #D4AF37;            /* Borde Dorado (Latón) */
+    border-radius: 10px;                  /* Esquinas suaves */
+    color: #FFFFFF;                       /* Letra blanca */
+    font-weight: bold;                    /* Negrita */
+    font-family: &quot;Segoe UI&quot;, Arial;       /* Tipografía limpia */
+    padding: 5px;                         /* Espacio interno */
+    min-width: 60px;                      /* Ancho mínimo para que no baile */
+    qproperty-alignment: AlignCenter;     /* Centrar el texto */
+}</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="4" column="5">
-    <widget class="QPushButton" name="btnDisparar">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>50</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Disparar</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="4">
-    <widget class="QPushButton" name="pushButton">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>60</width>
-       <height>50</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>50</width>
-       <height>50</height>
-      </size>
-     </property>
-     <property name="layoutDirection">
-      <enum>Qt::LeftToRight</enum>
-     </property>
-     <property name="autoFillBackground">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset theme="QIcon::ThemeIcon::GoHome"/>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>16</width>
-       <height>16</height>
-      </size>
-     </property>
-     <property name="autoRepeatDelay">
-      <number>300</number>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="5">
     <widget class="QGraphicsView" name="graphicsView">
      <property name="enabled">
@@ -93,34 +96,23 @@
    </item>
    <item row="1" column="4">
     <layout class="QGridLayout" name="gridLayout_3">
-     <item row="0" column="0">
-      <widget class="QLabel" name="lblTiempo">
-       <property name="font">
-        <font>
-         <family>Open Sans</family>
-         <pointsize>14</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>40</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
+     <item row="0" column="0" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
       <widget class="QLabel" name="lblAngulo">
        <property name="minimumSize">
         <size>
-         <width>30</width>
+         <width>76</width>
          <height>30</height>
         </size>
        </property>
        <property name="font">
         <font>
-         <pointsize>14</pointsize>
+         <family>Segoe UI</family>
+         <pointsize>24</pointsize>
+         <bold>true</bold>
         </font>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
        </property>
        <property name="text">
         <string>25°</string>
@@ -130,8 +122,21 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
+     <item row="2" column="0" alignment="Qt::AlignHCenter">
       <widget class="QSlider" name="verticalSlider">
+       <property name="font">
+        <font>
+         <family>SimSun</family>
+         <pointsize>15</pointsize>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="minimum">
+        <number>10</number>
+       </property>
        <property name="maximum">
         <number>90</number>
        </property>
@@ -144,6 +149,19 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item row="4" column="4" colspan="2">
+    <widget class="QPushButton" name="btnDisparar">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>50</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Disparar</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

@@ -1,25 +1,67 @@
 #ifndef PANTALLANIVEL1_H
 #define PANTALLANIVEL1_H
 
-#include <QDialog>
+#include <QWidget>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QTimer>
+#include <QGraphicsTextItem>
+#include <QTimer>
+#include <QList>
+#include <QKeyEvent>
+#include <QGraphicsSimpleTextItem>
+#include <QMediaPlayer>
+#include <QAudioOutput>
+#include "balacanon.h"
+#include "PersonajeNivel1.h"
+#include "isla.h"
 
-namespace Ui {
-class pantallaNivel1;
-}
-
-class pantallaNivel1 : public QDialog
+class PantallaNivel1 : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit pantallaNivel1(QWidget *parent = nullptr);
-    ~pantallaNivel1();
+    explicit PantallaNivel1(QWidget *parent = nullptr);
+    ~PantallaNivel1();
 
-private slots:
-    void on_pushButton_clicked();
+signals:
+    void regresarAlMenu();
+
+public slots:
+    void actualizarVida(int vida);
+    void actualizarVidas(int vidas);
+    void generarBala();
+    void generarIsla();
+    void manejarMuerte();
+    void reanudarSpawns();
+    void actualizarCronometro();
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
+    void showEvent(QShowEvent *event) override;
 
 private:
-    Ui::pantallaNivel1 *ui;
+    void crearEscenario();
+    void crearHUD();
+    void mostrarGameOver(bool ganado);
+    TipoDisparo obtenerSiguienteDisparo();
+    QGraphicsScene *scene;
+    QGraphicsView *view;
+    PersonajeNivel1 *jugador;
+    QTimer *gameTimer;
+    QTimer *spawnTimer;
+    QTimer *islaTimer;
+    QTimer *timerCronometro;
+    int tiempoRestante;
+    QGraphicsTextItem *textoVida;
+    QGraphicsTextItem *textoVidas;
+    QGraphicsTextItem *textoGameOver;
+    QGraphicsTextItem *textoCronometro;
+    QList<TipoDisparo> bolsaDisparos;
+    QMediaPlayer *musicaFondo;
+    QAudioOutput *salidaAudio;
 };
 
-#endif // PANTALLANIVEL1_H
+#endif

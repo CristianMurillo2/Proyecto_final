@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QStackedWidget>
 #include <QPainter>
 #include <QMovie>
 #include <QLabel>
@@ -31,13 +32,17 @@ private slots:
 
     void on_btnNivel3_clicked();
 
+    void volverAlMenuPrincipal();
+
 private:
     Ui::MainWindow *ui;
     QMovie *m_gifAnimacion;
     QLabel *m_fondoLabel;
-    pantallaNivel1 *pantalla1;
-    pantallaNivel2 *pantalla2;
-    pantallaNivel3 *pantalla3;
+    QStackedWidget *m_stack;
+    PantallaNivel1 *pantalla1 = nullptr;
+    pantallaNivel2 *pantalla2 = nullptr;
+    PantallaNivel3 *pantalla3 = nullptr;
+    void centrarVentana();
 };
 
 #endif // MAINWINDOW_H
