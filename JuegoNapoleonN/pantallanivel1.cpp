@@ -11,8 +11,6 @@
 PantallaNivel1::PantallaNivel1(QWidget *parent) : QWidget(parent)
 {
     this->setFocusPolicy(Qt::StrongFocus);
-
-    //this->setWindowState(Qt::WindowFullScreen);
     scene = new QGraphicsScene(this);
     view = new QGraphicsView(scene, this);
     view->setFocusPolicy(Qt::NoFocus);

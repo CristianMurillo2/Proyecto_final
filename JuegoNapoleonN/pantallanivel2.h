@@ -16,7 +16,6 @@
 #include <QSoundEffect>
 #include <QGraphicsTextItem>
 #include <QFont>
-#include <QDebug>
 #include <QMediaPlayer>
 #include <QAudioOutput>
 
