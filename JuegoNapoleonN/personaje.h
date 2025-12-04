@@ -39,7 +39,7 @@ protected:
     int vidasRestantes;
 
     static const int VIDA_INICIAL = 100;
-    static const int VIDAS_INICIALES = 3;
+    static const int VIDAS_INICIALES = 1;
 };
 
 #endif

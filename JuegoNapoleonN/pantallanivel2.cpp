@@ -59,7 +59,7 @@ void pantallaNivel2::iniciarNivel(){
     cannon = nullptr;
     base = nullptr;
     obst.clear();
-    tiempoRestante = 40;
+    tiempoRestante = 35;
 
     QImage imagen(":/recursos/fondo nivel-2.jpeg");
     QBrush fondo(imagen);
